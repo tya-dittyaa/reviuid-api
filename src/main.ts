@@ -8,6 +8,6 @@ async function bootstrap() {
   app.enableCors();
   app.use(helmet());
   app.use(csurf());
-  await app.listen(3000);
+  await app.listen(process.env.API_PORT);
 }
 bootstrap();
