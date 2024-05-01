@@ -13,33 +13,33 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model user {
-  id                 String               @id @default(cuid())
-  username           String               @unique
-  email              String               @unique
-  password           String
-  biography          String?              @default("")
-  user_film_favorite user_film_favorite[]
+model User {
+  id               String             @id @default(cuid())
+  username         String             @unique
+  email            String             @unique
+  password         String
+  biography        String?            @default("")
+  userFilmFavorite UserFilmFavorite[]
 }
 
-model film {
-  id                 String               @id @default(cuid())
-  title              String
-  synopsis           String
-  genre              String
-  totalRatings       Int                  @default(0)
-  totalFavorites     Int                  @default(0)
-  releaseDate        DateTime
-  finishDate         DateTime
-  poster             String
-  trailer            String
-  user_film_favorite user_film_favorite[]
+model Film {
+  id               String             @id @default(cuid())
+  title            String
+  synopsis         String
+  genre            String
+  totalRatings     Int                @default(0)
+  totalFavorites   Int                @default(0)
+  releaseDate      DateTime
+  finishDate       DateTime
+  poster           String
+  trailer          String
+  userFilmFavorite UserFilmFavorite[]
 }
 
-model user_film_favorite {
+model UserFilmFavorite {
   id     String @id @default(cuid())
   userId String
   filmId String
-  user   user   @relation(fields: [userId], references: [id])
-  film   film   @relation(fields: [filmId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+  film   Film   @relation(fields: [filmId], references: [id])
 }
