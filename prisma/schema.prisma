@@ -27,7 +27,7 @@ model Film {
   title            String
   synopsis         String
   genre            String
-  totalRatings     Int                @default(0)
+  totalRatings     Float              @default(0)
   totalFavorites   Int                @default(0)
   releaseDate      DateTime
   finishDate       DateTime
