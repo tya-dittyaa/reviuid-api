@@ -14,7 +14,7 @@ datasource db {
 }
 
 model User {
-  id               String             @id @default(cuid())
+  id               String             @id @default(uuid())
   username         String             @unique
   email            String             @unique
   password         String
@@ -23,7 +23,7 @@ model User {
 }
 
 model Film {
-  id               String             @id @default(cuid())
+  id               String             @id @default(uuid())
   title            String
   synopsis         String
   genre            String
@@ -37,7 +37,7 @@ model Film {
 }
 
 model UserFilmFavorite {
-  id     String @id @default(cuid())
+  id     String @id @default(uuid())
   userId String
   filmId String
   user   User   @relation(fields: [userId], references: [id])
