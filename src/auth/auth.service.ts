@@ -38,7 +38,7 @@ export class AuthService {
     const match = this.cryptoService.decryptPassword(user.password, password);
     if (!match) throw new UnauthorizedException('Invalid email or password');
 
-    const getUserToken = await this.tokenService.getTokenFromDatabase(user.id);
+    const getUserToken = await this.tokenService.getToken(user.id);
     if (getUserToken) return { access_token: getUserToken.token };
 
     delete user.username;
@@ -46,9 +46,16 @@ export class AuthService {
     delete user.biography;
 
     const access_token: string = await this.jwtService.signAsync(user);
-    await this.tokenService.addTokenToDatabase(user.id, access_token);
+    await this.tokenService.addToken(user.id, access_token);
 
     return { access_token };
+  }
+
+  async logout(token: string) {
+    token = token.replace('Bearer ', '');
+    const isTokenValid = await this.tokenService.getUser(token);
+    if (!isTokenValid) throw new UnauthorizedException('Invalid token');
+    await this.tokenService.deleteTokenFromDatabase(isTokenValid.userId);
   }
 
   test() {
