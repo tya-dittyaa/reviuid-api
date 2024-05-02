@@ -5,20 +5,28 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class TokenService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getTokenFromDatabase(userId: string) {
+  async getToken(userId: string) {
     return this.prisma.userLoginToken.findUnique({
       where: { userId, expired: { gte: new Date() } },
+      select: { token: true },
     });
   }
 
-  async verifyToken(token: string): Promise<boolean> {
+  async getUser(token: string) {
+    return this.prisma.userLoginToken.findFirst({
+      where: { token, expired: { gte: new Date() } },
+      select: { userId: true },
+    });
+  }
+
+  async verifyToken(token: string) {
     const foundToken = await this.prisma.userLoginToken.findFirst({
       where: { token, expired: { gte: new Date() } },
     });
     return !!foundToken;
   }
 
-  async addTokenToDatabase(userId: string, token: string) {
+  async addToken(userId: string, token: string) {
     const expired = this.generateExpirationDate();
     await this.prisma.userLoginToken.upsert({
       where: { userId },
