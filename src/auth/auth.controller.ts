@@ -8,7 +8,7 @@ import { UserLoginDto } from './dtos/userLogin.dto';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('/login')
+  @Post('login')
   @HttpCode(HttpStatus.OK)
   login(@Body() loginUserDto: UserLoginDto) {
     return this.authService.login(loginUserDto.email, loginUserDto.password);

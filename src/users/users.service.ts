@@ -12,7 +12,7 @@ export class UsersService {
       where: { OR: [{ username: data.username }, { email: data.email }] },
     });
 
-    if (user) throw new ConflictException('username or email already exists');
+    if (user) throw new ConflictException('Username or Email already exists');
 
     data.password = this.encryptPassword(data.password);
     await this.prisma.user.create({ data });
