@@ -7,6 +7,7 @@ import { UsersService } from 'src/users/users.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { CryptoService } from './guard/crypto.service';
+import { TokenService } from './guard/token.service';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { CryptoService } from './guard/crypto.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, CryptoService, UsersService],
+  providers: [AuthService, CryptoService, UsersService, TokenService],
   exports: [AuthService, CryptoService],
 })
 export class AuthModule {}
