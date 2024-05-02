@@ -2,10 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
+import configuration from './config/configuration';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const port = parseInt(process.env.API_PORT);
+  const port = configuration().port;
 
   app.enableCors();
   app.use(helmet());
@@ -21,4 +22,5 @@ async function bootstrap() {
 
   await app.listen(port);
 }
+
 bootstrap();
