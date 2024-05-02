@@ -6,10 +6,11 @@ import { UsersService } from 'src/users/users.service';
 export class AuthService {
   constructor(private usersService: UsersService) {}
 
-  async signIn(email: string, password: string) {
+  async login(email: string, password: string) {
     const user = await this.usersService.findUserByEmail(email);
-    const match = this.decryptPassword(user.password, password);
+    if (!user) throw new UnauthorizedException('Invalid email or password');
 
+    const match = this.decryptPassword(user.password, password);
     if (!match) throw new UnauthorizedException('Invalid email or password');
   }
 
