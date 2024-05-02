@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   HttpCode,
   HttpStatus,
   Post,
@@ -30,11 +31,18 @@ export class AuthController {
   @Post('login')
   @UsePipes(ValidationPipe)
   @HttpCode(HttpStatus.OK)
-  login(@Body() loginUserDto: UserLoginDto) {
-    return this.authService.login(loginUserDto.email, loginUserDto.password);
+  login(@Body() userLoginDto: UserLoginDto) {
+    return this.authService.login(userLoginDto.email, userLoginDto.password);
   }
 
-  @Get('test-auth')
+  @Get('logout')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  logout(@Headers('Authorization') token: string) {
+    return this.authService.logout(token);
+  }
+
+  @Get('test')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
   test() {
