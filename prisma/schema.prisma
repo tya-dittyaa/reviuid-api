@@ -26,8 +26,8 @@ model Film {
   id               String             @id @default(uuid())
   title            String
   synopsis         String
-  genre            String
-  totalRatings     Int                @default(0)
+  genre            FilmGenre[]
+  totalRatings     Float              @default(0)
   totalFavorites   Int                @default(0)
   releaseDate      DateTime
   finishDate       DateTime
@@ -42,4 +42,22 @@ model UserFilmFavorite {
   filmId String
   user   User   @relation(fields: [userId], references: [id])
   film   Film   @relation(fields: [filmId], references: [id])
+}
+
+enum FilmGenre {
+  ACTION
+  ADVENTURE
+  ANIMATION
+  COMEDY
+  CRIME
+  DRAMA
+  FANTASY
+  HISTORICAL
+  HORROR
+  MYSTERY
+  ROMANCE
+  SCIENCE_FICTION
+  THRILLER
+  WESTERN
+  OTHER
 }

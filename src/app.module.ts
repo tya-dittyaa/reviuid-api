@@ -7,8 +7,8 @@ import { UsersModule } from './users/users.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
-    UsersModule,
     AuthModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [],
