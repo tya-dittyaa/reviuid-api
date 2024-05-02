@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { randomBytes, scryptSync } from 'crypto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -12,14 +12,14 @@ export class UsersService {
       where: { OR: [{ username: data.username }, { email: data.email }] },
     });
 
-    if (user)
-      throw new HttpException(
-        'The input data is already exist',
-        HttpStatus.CONFLICT,
-      );
+    if (user) throw new ConflictException('username or email already exists');
 
     data.password = this.encryptPassword(data.password);
     await this.prisma.user.create({ data });
+  }
+
+  async findUserByEmail(email: string) {
+    return this.prisma.user.findFirst({ where: { email } });
   }
 
   private encryptPassword(password: string) {
