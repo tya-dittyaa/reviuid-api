@@ -19,7 +19,8 @@ model User {
   email            String             @unique
   password         String
   biography        String?            @default("")
-  userFilmFavorite UserFilmFavorite[]
+  UserLoginToken   UserLoginToken[]
+  UserFilmFavorite UserFilmFavorite[]
 }
 
 model Film {
@@ -33,7 +34,14 @@ model Film {
   finishDate       DateTime
   poster           String
   trailer          String
-  userFilmFavorite UserFilmFavorite[]
+  UserFilmFavorite UserFilmFavorite[]
+}
+
+model UserLoginToken {
+  userId  String   @id
+  token   String
+  expired DateTime
+  user    User     @relation(fields: [userId], references: [id])
 }
 
 model UserFilmFavorite {
