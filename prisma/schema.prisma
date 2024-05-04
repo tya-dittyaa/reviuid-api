@@ -14,58 +14,13 @@ datasource db {
 }
 
 model User {
-  id               String             @id @default(uuid())
-  username         String             @unique
-  email            String             @unique
-  password         String
-  biography        String?            @default("")
-  UserLoginToken   UserLoginToken[]
-  UserFilmFavorite UserFilmFavorite[]
-}
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-model Film {
-  id               String             @id @default(uuid())
-  title            String
-  synopsis         String
-  genre            FilmGenre[]
-  totalRatings     Float              @default(0)
-  totalFavorites   Int                @default(0)
-  releaseDate      DateTime
-  finishDate       DateTime
-  poster           String
-  trailer          String
-  UserFilmFavorite UserFilmFavorite[]
-}
+  email        String  @unique
+  password     String
+  refreshToken String?
 
-model UserLoginToken {
-  userId  String   @id
-  token   String
-  expired DateTime
-  user    User     @relation(fields: [userId], references: [id])
-}
-
-model UserFilmFavorite {
-  id     String @id @default(uuid())
-  userId String
-  filmId String
-  user   User   @relation(fields: [userId], references: [id])
-  film   Film   @relation(fields: [filmId], references: [id])
-}
-
-enum FilmGenre {
-  ACTION
-  ADVENTURE
-  ANIMATION
-  COMEDY
-  CRIME
-  DRAMA
-  FANTASY
-  HISTORICAL
-  HORROR
-  MYSTERY
-  ROMANCE
-  SCIENCE_FICTION
-  THRILLER
-  WESTERN
-  OTHER
+  @@map("users")
 }

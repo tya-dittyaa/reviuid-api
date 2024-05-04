@@ -1,51 +1,54 @@
 import {
   Body,
   Controller,
-  Get,
-  Headers,
   HttpCode,
   HttpStatus,
   Post,
   UseGuards,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import {
+  GetCurrentUser,
+  GetCurrentUserId,
+  Public,
+} from 'src/common/decorators';
+import { RtGuard } from 'src/common/guards';
 import { AuthService } from './auth.service';
-import { UserLoginDto } from './dtos/loginUser.dto';
-import { RegisterUserDto } from './dtos/registerUser.dto';
-import { AuthGuard } from './guard/jwt.auth.guard';
+import { SigninDto, SignupDto } from './dto';
 
 @ApiTags('Authentication Endpoints')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('register')
-  @UsePipes(ValidationPipe)
+  @Public()
+  @Post('signup')
   @HttpCode(HttpStatus.CREATED)
-  createUser(@Body() registerUserDto: RegisterUserDto) {
-    return this.authService.createUser(registerUserDto);
+  signup(@Body() dto: SignupDto) {
+    return this.authService.signup(dto);
   }
 
-  @Post('login')
-  @UsePipes(ValidationPipe)
+  @Public()
+  @Post('signin')
   @HttpCode(HttpStatus.OK)
-  login(@Body() userLoginDto: UserLoginDto) {
-    return this.authService.login(userLoginDto.email, userLoginDto.password);
+  signin(@Body() dto: SigninDto) {
+    return this.authService.signin(dto);
   }
 
-  @Get('logout')
+  @Post('signout')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(AuthGuard)
-  logout(@Headers('Authorization') token: string) {
-    return this.authService.logout(token);
+  signout(@GetCurrentUserId() userId: string) {
+    return this.authService.signout(userId);
   }
 
-  @Get('test')
+  @Public()
+  @UseGuards(RtGuard)
+  @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(AuthGuard)
-  test() {
-    return this.authService.test();
+  refresh(
+    @GetCurrentUserId() userId: string,
+    @GetCurrentUser('refreshToken') refreshToken: string,
+  ) {
+    return this.authService.refresh(userId, refreshToken);
   }
 }
