@@ -1,26 +1,25 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
-import configuration from './config/configuration';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const port = configuration().port;
 
-  app.enableCors();
   app.use(helmet());
+  app.enableCors();
+  app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
     .setTitle('Reviu.ID API Documentation')
-    .setDescription('The Reviu.ID API description for developers')
+    .setDescription('The Reviu.ID API Documentation for the backend service.')
     .setVersion('0.0.1')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(port);
+  await app.listen(4000);
 }
-
 bootstrap();
