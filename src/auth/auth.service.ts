@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Prisma, User } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { compare, genSalt, hash } from 'bcrypt';
+import * as argon from 'argon2';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SigninDto } from './dto';
 import { JwtPayload } from './types';
@@ -22,7 +22,7 @@ export class AuthService {
   ) {}
 
   async signup(dto: Prisma.UserCreateInput) {
-    const passwordHash = await this.hashingText(dto.password);
+    const passwordHash = await argon.hash(dto.password);
 
     await this.prisma.user
       .create({
@@ -46,10 +46,7 @@ export class AuthService {
 
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
-    const passwordMatch = await this.compareHashingText(
-      dto.password,
-      user.password,
-    );
+    const passwordMatch = await argon.verify(user.password, dto.password);
     if (!passwordMatch) throw new UnauthorizedException('Invalid credentials');
 
     const tokens = await this.getTokens(user);
@@ -67,17 +64,13 @@ export class AuthService {
 
   async refresh(userId: string, refreshToken: string) {
     const user = await this.prisma.user.findUnique({
-      where: { id: userId },
+      where: { id: userId, refreshToken: { not: null } },
     });
 
-    if (!user || !user.refreshToken)
-      throw new ForbiddenException('Access denied');
+    if (!user) throw new ForbiddenException('Access denied');
 
-    const refreshTokenMatch = await this.compareHashingText(
-      refreshToken,
-      user.refreshToken,
-    );
-    if (!refreshTokenMatch) throw new ForbiddenException('Access denied');
+    const rtMatch = await argon.verify(user.refreshToken, refreshToken);
+    if (!rtMatch) throw new ForbiddenException('Access denied');
 
     const tokens = await this.getTokens(user);
     await this.updateRefreshTokenHash(user.id, tokens.refreshToken);
@@ -86,7 +79,7 @@ export class AuthService {
   }
 
   async updateRefreshTokenHash(userId: string, refreshToken: string) {
-    const rtHash = await this.hashingText(refreshToken);
+    const rtHash = await argon.hash(refreshToken);
     return this.prisma.user.update({
       where: { id: userId },
       data: { refreshToken: rtHash },
@@ -108,16 +101,5 @@ export class AuthService {
     ]);
 
     return { accessToken, refreshToken };
-  }
-
-  async hashingText(text: string) {
-    const salt = await genSalt();
-    const hashing = await hash(text, salt);
-    return hashing;
-  }
-
-  async compareHashingText(text: string, textHash: string) {
-    const isMatch = await compare(text, textHash);
-    return isMatch;
   }
 }
