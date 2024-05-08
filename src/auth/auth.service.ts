@@ -33,7 +33,7 @@ export class AuthService {
           error instanceof PrismaClientKnownRequestError &&
           error.code === 'P2002'
         ) {
-          throw new ConflictException('Email already exists');
+          throw new ConflictException('Username or Email already exists');
         }
         throw error;
       });
