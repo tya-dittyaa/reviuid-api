@@ -18,10 +18,12 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  username     String  @unique
   email        String  @unique
   password     String
   refreshToken String?
+
+  username  String  @unique
+  biography String?
 
   @@map("users")
 }
