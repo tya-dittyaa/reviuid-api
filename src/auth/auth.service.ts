@@ -16,9 +16,9 @@ import { JwtPayload } from './types';
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: PrismaService,
-    private jwtService: JwtService,
-    private config: ConfigService,
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
+    private readonly config: ConfigService,
   ) {}
 
   async signup(dto: Prisma.UserCreateInput) {
