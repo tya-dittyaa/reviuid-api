@@ -35,11 +35,11 @@ model Film {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  title     String
-  sysnopsis String
-  genre     FilmGenre[]
-  poster    String
-  trailer   String
+  title    String
+  synopsis String
+  genre    FilmGenre[]
+  poster   String
+  trailer  String
 
   totalRating    Float @default(0)
   totalFavorites Int   @default(0)
@@ -67,19 +67,11 @@ model UserFilmFavorite {
 }
 
 enum FilmGenre {
-  ACTION
-  ADVENTURE
-  ANIMATION
-  COMEDY
-  CRIME
   DRAMA
-  FANTASY
-  HISTORICAL
-  HORROR
-  MYSTERY
-  ROMANCE
-  SCIENCE_FICTION
-  THRILLER
-  WESTERN
-  OTHER
+  KELUARGA
+  HOROR
+  KOMEDI
+  ROMANSA
+  AKSI
+  PSIKOLOGIS
 }
