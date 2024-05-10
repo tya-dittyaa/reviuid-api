@@ -5,6 +5,7 @@ import {
   IsStrongPassword,
   Length,
   MinLength,
+  NotContains,
 } from 'class-validator';
 
 export class SettingsDto {
@@ -14,11 +15,13 @@ export class SettingsDto {
 
   @IsOptional()
   @IsStrongPassword()
+  @NotContains(' ')
   password: string;
 
   @IsOptional()
   @IsString()
   @MinLength(3)
+  @NotContains(' ')
   username: string;
 
   @IsOptional()

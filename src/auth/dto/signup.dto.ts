@@ -4,12 +4,14 @@ import {
   IsString,
   IsStrongPassword,
   MinLength,
+  NotContains,
 } from 'class-validator';
 
 export class SignupDto {
   @IsNotEmpty()
   @IsString()
   @MinLength(3)
+  @NotContains(' ')
   username: string;
 
   @IsNotEmpty()
@@ -18,5 +20,6 @@ export class SignupDto {
 
   @IsNotEmpty()
   @IsStrongPassword()
+  @NotContains(' ')
   password: string;
 }
