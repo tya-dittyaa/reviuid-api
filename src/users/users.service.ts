@@ -5,7 +5,7 @@ import { SettingsDto } from './dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async getUserByUsername(username: string) {
     const user = await this.prisma.user.findUnique({
