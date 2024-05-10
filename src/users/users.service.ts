@@ -24,7 +24,9 @@ export class UsersService {
 
     const extendedUser = {
       ...user,
-      avatar: null,
+      avatar: undefined,
+      filmFavorites: [],
+      filmWatchlist: [],
     };
 
     return extendedUser;
