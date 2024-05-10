@@ -8,7 +8,7 @@ import {
   NotContains,
 } from 'class-validator';
 
-export class SettingsDto {
+export class UserSettingsDto {
   @IsOptional()
   @IsEmail()
   email: string;

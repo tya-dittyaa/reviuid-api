@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { hash } from 'argon2';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { SettingsDto } from './dto';
+import { UserSettingsDto } from './dto';
 
 @Injectable()
 export class UsersService {
@@ -32,7 +32,7 @@ export class UsersService {
     return extendedUser;
   }
 
-  async updateUserSettings(userId: string, dto: SettingsDto) {
+  async updateUserSettings(userId: string, dto: UserSettingsDto) {
     const email = dto.email ? dto.email : undefined;
     const password = dto.password ? await hash(dto.password) : undefined;
     const username = dto.username ? dto.username : undefined;

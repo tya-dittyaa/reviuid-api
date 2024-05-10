@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { GetCurrentUserId, Public } from 'src/common/decorators';
-import { SettingsDto } from './dto';
+import { UserSettingsDto } from './dto';
 import { UsersService } from './users.service';
 
 @ApiTags('Users Endpoints')
@@ -28,7 +28,7 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   async updateUserSettings(
     @GetCurrentUserId() userId: string,
-    @Body() dto: SettingsDto,
+    @Body() dto: UserSettingsDto,
   ) {
     return this.usersService.updateUserSettings(userId, dto);
   }
