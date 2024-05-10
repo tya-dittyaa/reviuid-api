@@ -19,7 +19,7 @@ import { SigninDto, SignupDto } from './dto';
 @ApiTags('Authentication Endpoints')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Public()
   @Post('signup')

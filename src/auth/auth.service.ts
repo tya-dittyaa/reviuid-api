@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Prisma, User } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import * as argon from 'argon2';
+import { hash, verify } from 'argon2';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SigninDto } from './dto';
 import { JwtPayload } from './types';
@@ -16,13 +16,13 @@ import { JwtPayload } from './types';
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: PrismaService,
-    private jwtService: JwtService,
-    private config: ConfigService,
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
+    private readonly config: ConfigService,
   ) {}
 
   async signup(dto: Prisma.UserCreateInput) {
-    const passwordHash = await argon.hash(dto.password);
+    const passwordHash = await hash(dto.password);
 
     await this.prisma.user
       .create({
@@ -33,7 +33,7 @@ export class AuthService {
           error instanceof PrismaClientKnownRequestError &&
           error.code === 'P2002'
         ) {
-          throw new ConflictException('Email already exists');
+          throw new ConflictException('Username or Email already exists');
         }
         throw error;
       });
@@ -46,7 +46,7 @@ export class AuthService {
 
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
-    const passwordMatch = await argon.verify(user.password, dto.password);
+    const passwordMatch = await verify(user.password, dto.password);
     if (!passwordMatch) throw new UnauthorizedException('Invalid credentials');
 
     const tokens = await this.getTokens(user);
@@ -69,7 +69,7 @@ export class AuthService {
 
     if (!user) throw new ForbiddenException('Access denied');
 
-    const rtMatch = await argon.verify(user.refreshToken, refreshToken);
+    const rtMatch = await verify(user.refreshToken, refreshToken);
     if (!rtMatch) throw new ForbiddenException('Access denied');
 
     const tokens = await this.getTokens(user);
@@ -79,7 +79,7 @@ export class AuthService {
   }
 
   async updateRefreshTokenHash(userId: string, refreshToken: string) {
-    const rtHash = await argon.hash(refreshToken);
+    const rtHash = await hash(refreshToken);
     return this.prisma.user.update({
       where: { id: userId },
       data: { refreshToken: rtHash },
