@@ -74,7 +74,7 @@ export class UsersService {
         email,
         password,
         username,
-        biography,
+        biography: biography === ' ' ? null : biography,
       },
     });
   }
