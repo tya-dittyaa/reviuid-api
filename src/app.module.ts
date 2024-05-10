@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { AtGuard } from './common/guards';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
+import { FilmsModule } from './films/films.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     PrismaModule,
     UsersModule,
+    FilmsModule,
   ],
   providers: [
     {
