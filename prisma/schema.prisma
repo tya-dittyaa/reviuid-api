@@ -27,8 +27,6 @@ model Users {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  UserFilmFavorite UserFilmFavorites[]
-
   @@map("users")
 }
 
@@ -49,23 +47,7 @@ model Films {
   releaseDate DateTime
   finishDate  DateTime
 
-  UserFilmFavorite UserFilmFavorites[]
-
   @@map("films")
-}
-
-model UserFilmFavorites {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user_id String
-  film_id String
-
-  user Users @relation(fields: [user_id], references: [id])
-  film Films @relation(fields: [film_id], references: [id])
-
-  @@map("user_film_favorites")
 }
 
 enum UserRole {
