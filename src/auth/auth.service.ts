@@ -30,13 +30,25 @@ export class AuthService {
       throw new BadRequestException('Username already exists');
     }
 
+    // if registering as admin, check if admin password is correct
+    if (dto.isAdmin === 'true') {
+      if (!dto.adminPassword) {
+        throw new BadRequestException('Admin password is required');
+      }
+      if (dto.adminPassword !== process.env.ADMIN_PASSWORD) {
+        throw new BadRequestException('Invalid admin password');
+      }
+    }
+
     // hash password
     const hashPassword = await hash(dto.password);
 
     // create user
     const newUser = await this.usersService.create({
-      ...dto,
+      email: dto.email,
       password: hashPassword,
+      username: dto.username,
+      role: dto.isAdmin === 'true' ? 'ADMIN' : 'USER',
     });
 
     // token
