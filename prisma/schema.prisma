@@ -33,7 +33,7 @@ model Users {
 }
 
 model Films {
-  id        String   @id @default(uuid())
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -55,7 +55,7 @@ model Films {
 }
 
 model UserFilmFavorites {
-  id        String   @id @default(uuid())
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
