@@ -108,4 +108,24 @@ export class UsersService {
     // Update the user
     await this.update(userId, dto);
   }
+
+  async deleteProfile(userId: string, username: string) {
+    // Check if the user exists
+    const user = await this.findByUsername(username);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.id !== userId) {
+      throw new ForbiddenException('You are not allowed to delete this user');
+    }
+
+    // Delete the user
+    await this.prisma.users.delete({
+      where: {
+        id: userId,
+      },
+    });
+  }
 }

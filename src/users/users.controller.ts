@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from 'src/common/decorators';
 import { AccessTokenGuard } from 'src/common/guards';
@@ -23,5 +31,14 @@ export class UsersController {
     @Body() dto: UpdateUserDto,
   ) {
     return this.usersService.updateProfile(userId, username, dto);
+  }
+
+  @Delete(':username')
+  @UseGuards(AccessTokenGuard)
+  async deleteProfile(
+    @User('sub') userId: string,
+    @Param('username') username: string,
+  ) {
+    return this.usersService.deleteProfile(userId, username);
   }
 }
