@@ -34,6 +34,13 @@ export class FilmsService {
     if (!film) {
       throw new NotFoundException('Film not found');
     }
+
+    delete film.createdAt;
+    delete film.updatedAt;
+    delete film.totalFavorites;
+    delete film.releaseDate;
+    delete film.finishDate;
+
     return film;
   }
 
