@@ -4,10 +4,10 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.userFilmFavorite.deleteMany();
-  await prisma.film.deleteMany();
+  await prisma.userFilmFavorites.deleteMany();
+  await prisma.films.deleteMany();
 
-  const films = await prisma.film.createMany({
+  const films = await prisma.films.createMany({
     data: [
       {
         title: 'Yang Tak Tergantikan',
