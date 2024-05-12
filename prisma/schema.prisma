@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id   String @id @default(cuid())
+  role String @default("USER")
+
+  email        String  @unique
+  password     String
+  refreshToken String?
+
+  username  String  @unique
+  biography String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  UserFilmFavorite UserFilmFavorite[]
+
+  @@map("users")
+}
+
+model Films {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title    String
+  synopsis String
+  genre    FilmGenre[]
+  poster   String
+  trailer  String
+
+  totalRating    Float @default(0)
+  totalFavorites Int   @default(0)
+
+  releaseDate DateTime
+  finishDate  DateTime
+
+  UserFilmFavorite UserFilmFavorite[]
+
+  @@map("films")
+}
+
+model UserFilmFavorite {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user_id String
+  film_id String
+
+  user Users @relation(fields: [user_id], references: [id])
+  film Films @relation(fields: [film_id], references: [id])
+
+  @@map("user_film_favorites")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum FilmGenre {
+  DRAMA
+  KELUARGA
+  HOROR
+  KOMEDI
+  ROMANSA
+  AKSI
+  PSIKOLOGIS
+}
