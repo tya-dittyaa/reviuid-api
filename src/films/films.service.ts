@@ -20,6 +20,14 @@ export class FilmsService {
     });
   }
 
+  async deleteFilm(id: string) {
+    await this.prisma.films.delete({
+      where: {
+        id,
+      },
+    });
+  }
+
   async getBroadcastToday() {
     const today = new Date();
     return this.prisma.films.findMany({

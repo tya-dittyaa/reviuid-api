@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators';
 import { Role } from 'src/common/enums';
@@ -16,6 +24,13 @@ export class FilmsController {
   @UseGuards(AccessTokenGuard, RolesGuard)
   async addFilm(@Body() dto: AddFilmDto) {
     return this.filmsService.addFilm(dto);
+  }
+
+  @Delete(':id')
+  @Roles(Role.Admin)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  async deleteFilm(@Param('id') id: string) {
+    return this.filmsService.deleteFilm(id);
   }
 
   @Get('broadcast-today')
