@@ -1,6 +1,8 @@
 import {
+  IsBooleanString,
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
   IsStrongPassword,
   MinLength,
@@ -22,4 +24,13 @@ export class SignupDto {
   @IsStrongPassword()
   @NotContains(' ')
   password: string;
+
+  @IsOptional()
+  @IsBooleanString()
+  isAdmin: string;
+
+  @IsOptional()
+  @IsStrongPassword()
+  @NotContains(' ')
+  adminPassword: string;
 }
