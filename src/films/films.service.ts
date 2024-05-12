@@ -19,4 +19,73 @@ export class FilmsService {
       },
     });
   }
+
+  async getBroadcastToday() {
+    const today = new Date();
+    return this.prisma.films.findMany({
+      where: {
+        releaseDate: {
+          lte: today,
+        },
+        finishDate: {
+          gte: today,
+        },
+      },
+      orderBy: {
+        releaseDate: 'desc',
+      },
+      select: {
+        id: true,
+        title: true,
+        poster: true,
+      },
+    });
+  }
+
+  async getTop10() {
+    return this.prisma.films.findMany({
+      take: 10,
+      orderBy: {
+        totalRating: 'desc',
+      },
+      select: {
+        id: true,
+        title: true,
+        poster: true,
+      },
+    });
+  }
+
+  async getTopFavorite() {
+    return this.prisma.films.findMany({
+      take: 10,
+      orderBy: {
+        totalFavorites: 'desc',
+      },
+      select: {
+        id: true,
+        title: true,
+        poster: true,
+      },
+    });
+  }
+
+  async getComingSoon() {
+    const today = new Date();
+    return this.prisma.films.findMany({
+      where: {
+        releaseDate: {
+          gt: today,
+        },
+      },
+      orderBy: {
+        releaseDate: 'asc',
+      },
+      select: {
+        id: true,
+        title: true,
+        poster: true,
+      },
+    });
+  }
 }

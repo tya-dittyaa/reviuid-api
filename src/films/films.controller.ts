@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators';
 import { Role } from 'src/common/enums';
@@ -16,5 +16,25 @@ export class FilmsController {
   @UseGuards(AccessTokenGuard, RolesGuard)
   async addFilm(@Body() dto: AddFilmDto) {
     return this.filmsService.addFilm(dto);
+  }
+
+  @Get('broadcast-today')
+  async getBroadcastToday() {
+    return this.filmsService.getBroadcastToday();
+  }
+
+  @Get('top-10')
+  async getTop10() {
+    return this.filmsService.getTop10();
+  }
+
+  @Get('top-favorite')
+  async getTopFavorite() {
+    return this.filmsService.getTopFavorite();
+  }
+
+  @Get('coming-soon')
+  async getComingSoon() {
+    return this.filmsService.getComingSoon();
   }
 }
