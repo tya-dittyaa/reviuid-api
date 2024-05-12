@@ -1,1 +1,1 @@
-export * from './settings.dto';
+export * from './updateUser.dto';

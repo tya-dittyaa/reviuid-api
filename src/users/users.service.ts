@@ -1,81 +1,111 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { hash } from 'argon2';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { SettingsDto } from './dto';
+import { UpdateUserDto } from './dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async getUserByUsername(username: string) {
-    const user = await this.prisma.user.findUnique({
+  async create(dto: Prisma.UsersCreateInput) {
+    return this.prisma.users.create({
+      data: dto,
+    });
+  }
+
+  async findById(id: string) {
+    return this.prisma.users.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
+
+  async findByEmail(email: string) {
+    return this.prisma.users.findUnique({
+      where: {
+        email,
+      },
+    });
+  }
+
+  async findByUsername(username: string) {
+    return this.prisma.users.findUnique({
       where: {
         username,
       },
-      select: {
-        username: true,
-        biography: true,
-      },
     });
+  }
+
+  async update(userId: string, data: Prisma.UsersUpdateInput) {
+    return this.prisma.users.update({
+      where: {
+        id: userId,
+      },
+      data,
+    });
+  }
+
+  async displayProfile(username: string) {
+    const user = await this.findByUsername(username);
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    const extendedUser = {
-      ...user,
-      avatar: undefined,
-      filmFavorites: [],
-      filmWatchlist: [],
+    return {
+      username: user.username,
+      biography: user.biography,
     };
-
-    return extendedUser;
   }
 
-  async updateUserSettings(userId: string, dto: SettingsDto) {
-    const email = dto.email ? dto.email : undefined;
-    const password = dto.password ? await hash(dto.password) : undefined;
-    const username = dto.username ? dto.username : undefined;
-    const biography = dto.biography ? dto.biography : undefined;
+  async updateProfile(userId: string, username: string, dto: UpdateUserDto) {
+    // Check if the user exists
+    const user = await this.findByUsername(username);
 
-    if (!email && !password && !username && !biography) {
-      throw new NotFoundException('No settings provided');
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
 
-    if (email) {
-      const userWithEmail = await this.prisma.user.findUnique({
-        where: {
-          email,
-        },
-      });
+    if (user.id !== userId) {
+      throw new ForbiddenException('You are not allowed to update this user');
+    }
 
-      if (userWithEmail) {
-        throw new NotFoundException('Email already in use');
+    // Check if the data contains invalid fields
+    const allowedFields = ['email', 'password', 'username', 'biography'];
+
+    const invalidFields = Object.keys(dto).filter(
+      (key) => !allowedFields.includes(key),
+    );
+
+    if (invalidFields.length > 0) {
+      throw new BadRequestException(
+        'Invalid fields: ' + invalidFields.join(', '),
+      );
+    }
+
+    // Check if the username is already taken
+    if (dto.username) {
+      const existingUser = await this.findByUsername(dto.username);
+      if (existingUser) {
+        throw new BadRequestException('Username already taken');
       }
     }
 
-    if (username) {
-      const userWithUsername = await this.prisma.user.findUnique({
-        where: {
-          username,
-        },
-      });
-
-      if (userWithUsername) {
-        throw new NotFoundException('Username already in use');
+    // Check if the email is already taken
+    if (dto.email) {
+      const existingEmail = await this.findByEmail(dto.email);
+      if (existingEmail) {
+        throw new BadRequestException('Email already taken');
       }
     }
 
-    await this.prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        email,
-        password,
-        username,
-        biography: biography === ' ' ? null : biography,
-      },
-    });
+    // Update the user
+    await this.update(userId, dto);
   }
 }

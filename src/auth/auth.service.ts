@@ -1,105 +1,133 @@
 import {
-  ConflictException,
+  BadRequestException,
   ForbiddenException,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { Prisma, User } from '@prisma/client';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { Users } from '@prisma/client';
 import { hash, verify } from 'argon2';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { SigninDto } from './dto';
-import { JwtPayload } from './types';
+import { UsersService } from 'src/users/users.service';
+import { JwtPayloadCreate } from '../common/types';
+import { SigninDto, SignupDto } from './dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
-    private readonly config: ConfigService,
   ) {}
 
-  async signup(dto: Prisma.UserCreateInput) {
-    const passwordHash = await hash(dto.password);
+  async signUp(dto: SignupDto) {
+    // check if email exists
+    const emailExists = await this.usersService.findByEmail(dto.email);
+    if (emailExists) {
+      throw new BadRequestException('Email already exists');
+    }
 
-    await this.prisma.user
-      .create({
-        data: { ...dto, password: passwordHash },
-      })
-      .catch((error) => {
-        if (
-          error instanceof PrismaClientKnownRequestError &&
-          error.code === 'P2002'
-        ) {
-          throw new ConflictException('Username or Email already exists');
-        }
-        throw error;
-      });
-  }
+    // check if username exists
+    const usernameExists = await this.usersService.findByUsername(dto.username);
+    if (usernameExists) {
+      throw new BadRequestException('Username already exists');
+    }
 
-  async signin(dto: SigninDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+    // hash password
+    const hashPassword = await hash(dto.password);
+
+    // create user
+    const newUser = await this.usersService.create({
+      ...dto,
+      password: hashPassword,
     });
 
-    if (!user) throw new UnauthorizedException('Invalid credentials');
+    // token
+    const tokens = await this.getTokens(newUser);
+    await this.updateRefreshToken(newUser.id, tokens.refreshToken);
 
+    return tokens;
+  }
+
+  async signIn(dto: SigninDto) {
+    // check if user exists
+    const user = await this.usersService.findByEmail(dto.email);
+    if (!user) {
+      throw new BadRequestException('Invalid credentials');
+    }
+
+    // check if password is correct
     const passwordMatch = await verify(user.password, dto.password);
-    if (!passwordMatch) throw new UnauthorizedException('Invalid credentials');
+    if (!passwordMatch) {
+      throw new BadRequestException('Invalid credentials');
+    }
 
+    // token
     const tokens = await this.getTokens(user);
-    await this.updateRefreshTokenHash(user.id, tokens.refreshToken);
+    await this.updateRefreshToken(user.id, tokens.refreshToken);
 
     return tokens;
   }
 
-  async signout(userId: string) {
-    await this.prisma.user.updateMany({
-      where: { id: userId, refreshToken: { not: null } },
-      data: { refreshToken: null },
+  async signOut(userId: string) {
+    // check if user exists
+    const user = await this.usersService.findById(userId);
+    if (!user || !user.refreshToken) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    // remove refresh token
+    await this.usersService.update(userId, {
+      refreshToken: null,
     });
   }
 
-  async refresh(userId: string, refreshToken: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId, refreshToken: { not: null } },
-    });
+  async refreshTokens(userId: string, refreshToken: string) {
+    // check if user exists
+    const user = await this.usersService.findById(userId);
+    if (!user || !user.refreshToken) {
+      throw new ForbiddenException('Access denied');
+    }
 
-    if (!user) throw new ForbiddenException('Access denied');
+    // check if refresh token is valid
+    const isValid = await verify(user.refreshToken, refreshToken);
+    if (!isValid) {
+      throw new ForbiddenException('Access denied');
+    }
 
-    const rtMatch = await verify(user.refreshToken, refreshToken);
-    if (!rtMatch) throw new ForbiddenException('Access denied');
-
+    // token
     const tokens = await this.getTokens(user);
-    await this.updateRefreshTokenHash(user.id, tokens.refreshToken);
+    await this.updateRefreshToken(user.id, tokens.refreshToken);
 
     return tokens;
   }
 
-  async updateRefreshTokenHash(userId: string, refreshToken: string) {
-    const rtHash = await hash(refreshToken);
-    return this.prisma.user.update({
-      where: { id: userId },
-      data: { refreshToken: rtHash },
+  async updateRefreshToken(userId: string, refreshToken: string) {
+    const hashedRefreshToken = await hash(refreshToken);
+    await this.usersService.update(userId, {
+      refreshToken: hashedRefreshToken,
     });
   }
 
-  async getTokens(user: User) {
-    const jwtPayload: JwtPayload = { sub: user.id, email: user.email };
+  async getTokens(user: Users) {
+    const jwtPayload: JwtPayloadCreate = {
+      sub: user.id,
+      email: user.email,
+      username: user.username,
+      role: user.role,
+    };
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(jwtPayload, {
-        secret: this.config.get<string>('JWT_ACCESS_TOKEN_SECRET'),
+        secret: process.env.JWT_ACCESS_SECRET,
         expiresIn: '15m',
       }),
       this.jwtService.signAsync(jwtPayload, {
-        secret: this.config.get<string>('JWT_REFRESH_TOKEN_SECRET'),
+        secret: process.env.JWT_REFRESH_SECRET,
         expiresIn: '7d',
       }),
     ]);
 
-    return { accessToken, refreshToken };
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 }

@@ -1,18 +1,9 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import {
-  GetCurrentUser,
-  GetCurrentUserId,
-  Public,
-} from 'src/common/decorators';
-import { RtGuard } from 'src/common/guards';
+import { Request } from 'express';
+import { User } from 'src/common/decorators';
+import { AccessTokenGuard, RefreshTokenGuard } from 'src/common/guards';
+import { JwtPayloadData } from '../common/types';
 import { AuthService } from './auth.service';
 import { SigninDto, SignupDto } from './dto';
 
@@ -21,34 +12,25 @@ import { SigninDto, SignupDto } from './dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Public()
   @Post('signup')
-  @HttpCode(HttpStatus.CREATED)
-  signup(@Body() dto: SignupDto) {
-    return this.authService.signup(dto);
+  async signup(@Body() dto: SignupDto) {
+    return this.authService.signUp(dto);
   }
 
-  @Public()
   @Post('signin')
-  @HttpCode(HttpStatus.OK)
-  signin(@Body() dto: SigninDto) {
-    return this.authService.signin(dto);
+  async signin(@Body() dto: SigninDto) {
+    return this.authService.signIn(dto);
   }
 
-  @Post('signout')
-  @HttpCode(HttpStatus.OK)
-  signout(@GetCurrentUserId() userId: string) {
-    return this.authService.signout(userId);
+  @Get('signout')
+  @UseGuards(AccessTokenGuard)
+  async signout(@Req() req: Request) {
+    return this.authService.signOut(req.user['sub']);
   }
 
-  @Public()
-  @UseGuards(RtGuard)
-  @Post('refresh')
-  @HttpCode(HttpStatus.OK)
-  refresh(
-    @GetCurrentUserId() userId: string,
-    @GetCurrentUser('refreshToken') refreshToken: string,
-  ) {
-    return this.authService.refresh(userId, refreshToken);
+  @Get('refresh')
+  @UseGuards(RefreshTokenGuard)
+  async refresh(@User() user: JwtPayloadData) {
+    return this.authService.refreshTokens(user.sub, user.refreshToken);
   }
 }

@@ -13,10 +13,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Users {
+  id   String @id @default(cuid())
+  role String @default("USER")
 
   email        String  @unique
   password     String
@@ -25,21 +24,24 @@ model User {
   username  String  @unique
   biography String?
 
-  UserFilmFavorite UserFilmFavorite[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  UserFilmFavorite UserFilmFavorites[]
 
   @@map("users")
 }
 
-model Film {
+model Films {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  title     String
-  sysnopsis String
-  genre     FilmGenre[]
-  poster    String
-  trailer   String
+  title    String
+  synopsis String
+  genre    FilmGenre[]
+  poster   String
+  trailer  String
 
   totalRating    Float @default(0)
   totalFavorites Int   @default(0)
@@ -47,12 +49,12 @@ model Film {
   releaseDate DateTime
   finishDate  DateTime
 
-  UserFilmFavorite UserFilmFavorite[]
+  UserFilmFavorite UserFilmFavorites[]
 
   @@map("films")
 }
 
-model UserFilmFavorite {
+model UserFilmFavorites {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -60,26 +62,23 @@ model UserFilmFavorite {
   user_id String
   film_id String
 
-  user User @relation(fields: [user_id], references: [id])
-  film Film @relation(fields: [film_id], references: [id])
+  user Users @relation(fields: [user_id], references: [id])
+  film Films @relation(fields: [film_id], references: [id])
 
   @@map("user_film_favorites")
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
 enum FilmGenre {
-  ACTION
-  ADVENTURE
-  ANIMATION
-  COMEDY
-  CRIME
   DRAMA
-  FANTASY
-  HISTORICAL
-  HORROR
-  MYSTERY
-  ROMANCE
-  SCIENCE_FICTION
-  THRILLER
-  WESTERN
-  OTHER
+  KELUARGA
+  HOROR
+  KOMEDI
+  ROMANSA
+  AKSI
+  PSIKOLOGIS
 }

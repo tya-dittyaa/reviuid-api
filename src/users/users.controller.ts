@@ -1,15 +1,8 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { GetCurrentUserId, Public } from 'src/common/decorators';
-import { SettingsDto } from './dto';
+import { User } from 'src/common/decorators';
+import { AccessTokenGuard } from 'src/common/guards';
+import { UpdateUserDto } from './dto';
 import { UsersService } from './users.service';
 
 @ApiTags('Users Endpoints')
@@ -17,19 +10,18 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Public()
   @Get(':username')
-  @HttpCode(HttpStatus.OK)
-  async getUserByUsername(@Param('username') username: string) {
-    return this.usersService.getUserByUsername(username);
+  async displayProfile(@Param('username') username: string) {
+    return this.usersService.displayProfile(username);
   }
 
-  @Post('settings')
-  @HttpCode(HttpStatus.OK)
-  async updateUserSettings(
-    @GetCurrentUserId() userId: string,
-    @Body() dto: SettingsDto,
+  @Patch(':username')
+  @UseGuards(AccessTokenGuard)
+  async updateProfile(
+    @User('sub') userId: string,
+    @Param('username') username: string,
+    @Body() dto: UpdateUserDto,
   ) {
-    return this.usersService.updateUserSettings(userId, dto);
+    return this.usersService.updateProfile(userId, username, dto);
   }
 }
