@@ -26,6 +26,11 @@ export class FilmsController {
     return this.filmsService.addFilm(dto);
   }
 
+  @Get(':id')
+  async getFilm(@Param('id') id: string) {
+    return this.filmsService.getFilm(id);
+  }
+
   @Delete(':id')
   @Roles(Role.Admin)
   @UseGuards(AccessTokenGuard, RolesGuard)

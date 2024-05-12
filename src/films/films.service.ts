@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AddFilmDto } from './dto';
 
@@ -20,7 +20,30 @@ export class FilmsService {
     });
   }
 
+  async findById(id: string) {
+    return this.prisma.films.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
+
+  async getFilm(id: string) {
+    // Check if the film exists
+    const film = await this.findById(id);
+    if (!film) {
+      throw new NotFoundException('Film not found');
+    }
+    return film;
+  }
+
   async deleteFilm(id: string) {
+    // Check if the film exists
+    const film = await this.findById(id);
+    if (!film) {
+      throw new NotFoundException('Film not found');
+    }
+
     await this.prisma.films.delete({
       where: {
         id,
@@ -30,7 +53,7 @@ export class FilmsService {
 
   async getBroadcastToday() {
     const today = new Date();
-    return this.prisma.films.findMany({
+    const list = await this.prisma.films.findMany({
       where: {
         releaseDate: {
           lte: today,
@@ -48,10 +71,16 @@ export class FilmsService {
         poster: true,
       },
     });
+
+    if (list.length === 0) {
+      throw new NotFoundException('No films are broadcasting today');
+    }
+
+    return list;
   }
 
   async getTop10() {
-    return this.prisma.films.findMany({
+    const list = await this.prisma.films.findMany({
       take: 10,
       orderBy: {
         totalRating: 'desc',
@@ -62,10 +91,16 @@ export class FilmsService {
         poster: true,
       },
     });
+
+    if (list.length === 0) {
+      throw new NotFoundException('No films are available yet');
+    }
+
+    return list;
   }
 
   async getTopFavorite() {
-    return this.prisma.films.findMany({
+    const list = await this.prisma.films.findMany({
       take: 10,
       orderBy: {
         totalFavorites: 'desc',
@@ -76,11 +111,17 @@ export class FilmsService {
         poster: true,
       },
     });
+
+    if (list.length === 0) {
+      throw new NotFoundException('No films are available yet');
+    }
+
+    return list;
   }
 
   async getComingSoon() {
     const today = new Date();
-    return this.prisma.films.findMany({
+    const list = await this.prisma.films.findMany({
       where: {
         releaseDate: {
           gt: today,
@@ -95,5 +136,11 @@ export class FilmsService {
         poster: true,
       },
     });
+
+    if (list.length === 0) {
+      throw new NotFoundException('No films are coming soon');
+    }
+
+    return list;
   }
 }
