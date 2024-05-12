@@ -1,6 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AddFilmDto } from './dto';
+import { AddFilmDto, UpdateFilmDto } from './dto';
 
 @Injectable()
 export class FilmsService {
@@ -42,6 +46,49 @@ export class FilmsService {
     delete film.finishDate;
 
     return film;
+  }
+
+  async updateFilm(id: string, dto: UpdateFilmDto) {
+    // Check if the film exists
+    const film = await this.findById(id);
+    if (!film) {
+      throw new NotFoundException('Film not found');
+    }
+
+    // Check if the data contains invalid fields
+    const allowedFields = [
+      'title',
+      'synopsis',
+      'genre',
+      'poster',
+      'trailer',
+      'releaseDate',
+      'finishDate',
+    ];
+
+    const invalidFields = Object.keys(dto).filter(
+      (key) => !allowedFields.includes(key),
+    );
+
+    if (invalidFields.length > 0) {
+      throw new BadRequestException(
+        'Invalid fields: ' + invalidFields.join(', '),
+      );
+    }
+
+    // Convert the date strings to Date objects
+    if (dto.releaseDate) dto.releaseDate = new Date(dto.releaseDate);
+    if (dto.finishDate) dto.finishDate = new Date(dto.finishDate);
+
+    // Update the film
+    await this.prisma.films.update({
+      where: {
+        id,
+      },
+      data: {
+        ...dto,
+      },
+    });
   }
 
   async deleteFilm(id: string) {

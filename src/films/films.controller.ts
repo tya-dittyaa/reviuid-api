@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -11,7 +12,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators';
 import { Role } from 'src/common/enums';
 import { AccessTokenGuard, RolesGuard } from 'src/common/guards';
-import { AddFilmDto } from './dto';
+import { AddFilmDto, UpdateFilmDto } from './dto';
 import { FilmsService } from './films.service';
 
 @ApiTags('Films Endpoints')
@@ -29,6 +30,13 @@ export class FilmsController {
   @Get(':id')
   async getFilm(@Param('id') id: string) {
     return this.filmsService.getFilm(id);
+  }
+
+  @Patch(':id')
+  @Roles(Role.Admin)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  async updateFilm(@Param('id') id: string, @Body() dto: UpdateFilmDto) {
+    return this.filmsService.updateFilm(id, dto);
   }
 
   @Delete(':id')
