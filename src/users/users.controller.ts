@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Patch,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -40,5 +41,41 @@ export class UsersController {
     @Param('username') username: string,
   ) {
     return this.usersService.deleteProfile(userId, username);
+  }
+
+  @Put('films/favorites/:filmId')
+  @UseGuards(AccessTokenGuard)
+  async addFavoriteFilm(
+    @User('sub') userId: string,
+    @Param('filmId') filmId: string,
+  ) {
+    return this.usersService.addFavoriteFilm(userId, filmId);
+  }
+
+  @Put('films/watchlist/:filmId')
+  @UseGuards(AccessTokenGuard)
+  async addFilmToWatchlist(
+    @User('sub') userId: string,
+    @Param('filmId') filmId: string,
+  ) {
+    return this.usersService.addWatchlistFilm(userId, filmId);
+  }
+
+  @Delete('films/favorites/:filmId')
+  @UseGuards(AccessTokenGuard)
+  async removeFavoriteFilm(
+    @User('sub') userId: string,
+    @Param('filmId') filmId: string,
+  ) {
+    return this.usersService.removeFavoriteFilm(userId, filmId);
+  }
+
+  @Delete('films/watchlist/:filmId')
+  @UseGuards(AccessTokenGuard)
+  async removeWatchlistFilm(
+    @User('sub') userId: string,
+    @Param('filmId') filmId: string,
+  ) {
+    return this.usersService.removeWatchlistFilm(userId, filmId);
   }
 }
