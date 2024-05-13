@@ -228,6 +228,32 @@ export class FilmsService {
     });
   }
 
+  async removeFavoriteFilm(userId: string, filmId: string) {
+    // Check if the film exists
+    const film = await this.findById(filmId);
+    if (!film) {
+      throw new NotFoundException('Film not found');
+    }
+
+    // Check if the user added the film to favorites
+    const existingFavorite = await this.prisma.userFilmFavorite.findFirst({
+      where: {
+        user_id: userId,
+        film_id: filmId,
+      },
+    });
+    if (!existingFavorite) {
+      throw new BadRequestException('Film not added to favorites');
+    }
+
+    // Remove the film from the user's favorite films
+    await this.prisma.userFilmFavorite.delete({
+      where: {
+        id: existingFavorite.id,
+      },
+    });
+  }
+
   async addWatchlistFilm(userId: string, filmId: string) {
     // Check if the film exists
     const film = await this.findById(filmId);
@@ -251,32 +277,6 @@ export class FilmsService {
       data: {
         user_id: userId,
         film_id: filmId,
-      },
-    });
-  }
-
-  async removeFavoriteFilm(userId: string, filmId: string) {
-    // Check if the film exists
-    const film = await this.findById(filmId);
-    if (!film) {
-      throw new NotFoundException('Film not found');
-    }
-
-    // Check if the user added the film to favorites
-    const existingFavorite = await this.prisma.userFilmFavorite.findFirst({
-      where: {
-        user_id: userId,
-        film_id: filmId,
-      },
-    });
-    if (!existingFavorite) {
-      throw new BadRequestException('Film not added to favorites');
-    }
-
-    // Remove the film from the user's favorite films
-    await this.prisma.userFilmFavorite.delete({
-      where: {
-        id: existingFavorite.id,
       },
     });
   }

@@ -76,15 +76,6 @@ export class FilmsController {
     return this.filmsService.addFavoriteFilm(userId, filmId);
   }
 
-  @Put('users/watchlist/:filmId')
-  @UseGuards(AccessTokenGuard)
-  async addFilmToWatchlist(
-    @User('sub') userId: string,
-    @Param('filmId') filmId: string,
-  ) {
-    return this.filmsService.addWatchlistFilm(userId, filmId);
-  }
-
   @Delete('users/favorites/:filmId')
   @UseGuards(AccessTokenGuard)
   async removeFavoriteFilm(
@@ -92,6 +83,15 @@ export class FilmsController {
     @Param('filmId') filmId: string,
   ) {
     return this.filmsService.removeFavoriteFilm(userId, filmId);
+  }
+
+  @Put('users/watchlist/:filmId')
+  @UseGuards(AccessTokenGuard)
+  async addFilmToWatchlist(
+    @User('sub') userId: string,
+    @Param('filmId') filmId: string,
+  ) {
+    return this.filmsService.addWatchlistFilm(userId, filmId);
   }
 
   @Delete('users/watchlist/:filmId')
