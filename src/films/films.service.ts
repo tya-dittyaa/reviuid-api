@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AddFilmDto, UpdateFilmDto } from './dto';
+import { AddFilmDto, AddUserFilmReviuwDto, UpdateFilmDto } from './dto';
 
 @Injectable()
 export class FilmsService {
@@ -32,6 +32,55 @@ export class FilmsService {
     });
   }
 
+  async calculateTotalRating(filmId: string) {
+    const totalRating = await this.prisma.userFilmReview.aggregate({
+      where: {
+        film_id: filmId,
+      },
+      _sum: {
+        rating: true,
+      },
+    });
+
+    const totalReviews = await this.prisma.userFilmReview.count({
+      where: {
+        film_id: filmId,
+      },
+    });
+
+    const rating =
+      totalReviews !== 0 && !isNaN(totalRating._sum.rating)
+        ? totalRating._sum.rating / totalReviews
+        : 0;
+
+    await this.prisma.films.update({
+      where: {
+        id: filmId,
+      },
+      data: {
+        rating: rating,
+        totalRatings: totalReviews,
+      },
+    });
+  }
+
+  async calculateTotalFavorites(filmId: string) {
+    const totalFavorites = await this.prisma.userFilmFavorite.count({
+      where: {
+        film_id: filmId,
+      },
+    });
+
+    await this.prisma.films.update({
+      where: {
+        id: filmId,
+      },
+      data: {
+        totalFavorites,
+      },
+    });
+  }
+
   async getFilm(id: string) {
     // Check if the film exists
     const film = await this.findById(id);
@@ -45,7 +94,10 @@ export class FilmsService {
     delete film.releaseDate;
     delete film.finishDate;
 
-    return film;
+    return {
+      film,
+      userReviews: [],
+    };
   }
 
   async updateFilm(id: string, dto: UpdateFilmDto) {
@@ -137,7 +189,7 @@ export class FilmsService {
     const list = await this.prisma.films.findMany({
       take: 10,
       orderBy: {
-        totalRating: 'desc',
+        rating: 'desc',
       },
       select: {
         id: true,
@@ -196,5 +248,192 @@ export class FilmsService {
     }
 
     return list;
+  }
+
+  async addFavoriteFilm(userId: string, filmId: string) {
+    // Check if the film exists
+    const film = await this.findById(filmId);
+    if (!film) {
+      throw new NotFoundException('Film not found');
+    }
+
+    // Check if user already added the film to favorites
+    const existingFavorite = await this.prisma.userFilmFavorite.findFirst({
+      where: {
+        user_id: userId,
+        film_id: filmId,
+      },
+    });
+    if (existingFavorite) {
+      throw new BadRequestException('Film already added to favorites');
+    }
+
+    // Add the film to the user's favorite films
+    await this.prisma.userFilmFavorite.create({
+      data: {
+        user_id: userId,
+        film_id: filmId,
+      },
+    });
+
+    // Calculate the total favorites for the film
+    await this.calculateTotalFavorites(filmId);
+  }
+
+  async removeFavoriteFilm(userId: string, filmId: string) {
+    // Check if the film exists
+    const film = await this.findById(filmId);
+    if (!film) {
+      throw new NotFoundException('Film not found');
+    }
+
+    // Check if the user added the film to favorites
+    const existingFavorite = await this.prisma.userFilmFavorite.findFirst({
+      where: {
+        user_id: userId,
+        film_id: filmId,
+      },
+    });
+    if (!existingFavorite) {
+      throw new BadRequestException('Film not added to favorites');
+    }
+
+    // Remove the film from the user's favorite films
+    await this.prisma.userFilmFavorite.delete({
+      where: {
+        id: existingFavorite.id,
+      },
+    });
+
+    // Calculate the total favorites for the film
+    await this.calculateTotalFavorites(filmId);
+  }
+
+  async addWatchlistFilm(userId: string, filmId: string) {
+    // Check if the film exists
+    const film = await this.findById(filmId);
+    if (!film) {
+      throw new NotFoundException('Film not found');
+    }
+
+    // Check if user already added the film to watchlist
+    const existingWatchlist = await this.prisma.userFilmWatchlist.findFirst({
+      where: {
+        user_id: userId,
+        film_id: filmId,
+      },
+    });
+    if (existingWatchlist) {
+      throw new BadRequestException('Film already added to watchlist');
+    }
+
+    // Add the film to the user's watchlist
+    await this.prisma.userFilmWatchlist.create({
+      data: {
+        user_id: userId,
+        film_id: filmId,
+      },
+    });
+  }
+
+  async removeWatchlistFilm(userId: string, filmId: string) {
+    // Check if the film exists
+    const film = await this.findById(filmId);
+    if (!film) {
+      throw new NotFoundException('Film not found');
+    }
+
+    // Check if the user added the film to watchlist
+    const existingWatchlist = await this.prisma.userFilmWatchlist.findFirst({
+      where: {
+        user_id: userId,
+        film_id: filmId,
+      },
+    });
+    if (!existingWatchlist) {
+      throw new BadRequestException('Film not added to watchlist');
+    }
+
+    // Remove the film from the user's watchlist
+    await this.prisma.userFilmWatchlist.delete({
+      where: {
+        id: existingWatchlist.id,
+      },
+    });
+  }
+
+  async addFilmReview(
+    userId: string,
+    filmId: string,
+    dto: AddUserFilmReviuwDto,
+  ) {
+    // Check if the film exists
+    const film = await this.findById(filmId);
+    if (!film) {
+      throw new NotFoundException('Film not found');
+    }
+
+    // Check if the user added review to the film
+    const existingReview = await this.prisma.userFilmReview.findFirst({
+      where: {
+        user_id: userId,
+        film_id: filmId,
+      },
+    });
+    if (existingReview) {
+      throw new BadRequestException('Review already added');
+    }
+
+    // Check if the rating is floating point
+    if (!Number.isInteger(dto.rating)) {
+      throw new BadRequestException('Rating must be an integer');
+    }
+
+    // Check if the rating is between 1 and 5
+    if (dto.rating < 1 || dto.rating > 5) {
+      throw new BadRequestException('Rating must be between 1 and 5');
+    }
+
+    // Add the review to the film
+    await this.prisma.userFilmReview.create({
+      data: {
+        user_id: userId,
+        film_id: filmId,
+        rating: dto.rating,
+        review: dto.review,
+      },
+    });
+
+    // Calculate the total rating for the film
+    await this.calculateTotalRating(filmId);
+  }
+
+  async removeFilmReview(userId: string, filmId: string) {
+    // Check if the film exists
+    const film = await this.findById(filmId);
+    if (!film) {
+      throw new NotFoundException('Film not found');
+    }
+
+    // Check if the user added review to the film
+    const existingReview = await this.prisma.userFilmReview.findFirst({
+      where: {
+        user_id: userId,
+        film_id: filmId,
+      },
+    });
+    if (!existingReview) {
+      throw new BadRequestException('Review not found');
+    }
+
+    // Remove the review from the film
+    await this.prisma.userFilmReview.delete({
+      where: {
+        id: existingReview.id,
+      },
+    });
+
+    // Calculate the total rating for the film
+    await this.calculateTotalRating(filmId);
   }
 }

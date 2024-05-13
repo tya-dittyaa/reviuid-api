@@ -5,16 +5,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { FilmsService } from 'src/films/films.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserDto } from './dto';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly filmsService: FilmsService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: Prisma.UsersCreateInput) {
     return this.prisma.users.create({
@@ -163,112 +159,6 @@ export class UsersService {
     await this.prisma.users.delete({
       where: {
         id: userId,
-      },
-    });
-  }
-
-  async addFavoriteFilm(userId: string, filmId: string) {
-    // Check if the film exists
-    const film = await this.filmsService.findById(filmId);
-    if (!film) {
-      throw new NotFoundException('Film not found');
-    }
-
-    // Check if user already added the film to favorites
-    const existingFavorite = await this.prisma.userFilmFavorite.findFirst({
-      where: {
-        user_id: userId,
-        film_id: filmId,
-      },
-    });
-    if (existingFavorite) {
-      throw new BadRequestException('Film already added to favorites');
-    }
-
-    // Add the film to the user's favorite films
-    await this.prisma.userFilmFavorite.create({
-      data: {
-        user_id: userId,
-        film_id: filmId,
-      },
-    });
-  }
-
-  async addWatchlistFilm(userId: string, filmId: string) {
-    // Check if the film exists
-    const film = await this.filmsService.findById(filmId);
-    if (!film) {
-      throw new NotFoundException('Film not found');
-    }
-
-    // Check if user already added the film to watchlist
-    const existingWatchlist = await this.prisma.userFilmWatchlist.findFirst({
-      where: {
-        user_id: userId,
-        film_id: filmId,
-      },
-    });
-    if (existingWatchlist) {
-      throw new BadRequestException('Film already added to watchlist');
-    }
-
-    // Add the film to the user's watchlist
-    await this.prisma.userFilmWatchlist.create({
-      data: {
-        user_id: userId,
-        film_id: filmId,
-      },
-    });
-  }
-
-  async removeFavoriteFilm(userId: string, filmId: string) {
-    // Check if the film exists
-    const film = await this.filmsService.findById(filmId);
-    if (!film) {
-      throw new NotFoundException('Film not found');
-    }
-
-    // Check if the user added the film to favorites
-    const existingFavorite = await this.prisma.userFilmFavorite.findFirst({
-      where: {
-        user_id: userId,
-        film_id: filmId,
-      },
-    });
-    if (!existingFavorite) {
-      throw new BadRequestException('Film not added to favorites');
-    }
-
-    // Remove the film from the user's favorite films
-    await this.prisma.userFilmFavorite.delete({
-      where: {
-        id: existingFavorite.id,
-      },
-    });
-  }
-
-  async removeWatchlistFilm(userId: string, filmId: string) {
-    // Check if the film exists
-    const film = await this.filmsService.findById(filmId);
-    if (!film) {
-      throw new NotFoundException('Film not found');
-    }
-
-    // Check if the user added the film to watchlist
-    const existingWatchlist = await this.prisma.userFilmWatchlist.findFirst({
-      where: {
-        user_id: userId,
-        film_id: filmId,
-      },
-    });
-    if (!existingWatchlist) {
-      throw new BadRequestException('Film not added to watchlist');
-    }
-
-    // Remove the film from the user's watchlist
-    await this.prisma.userFilmWatchlist.delete({
-      where: {
-        id: existingWatchlist.id,
       },
     });
   }
