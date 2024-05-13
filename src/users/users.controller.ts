@@ -5,12 +5,13 @@ import {
   Get,
   Param,
   Patch,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from 'src/common/decorators';
 import { AccessTokenGuard } from 'src/common/guards';
-import { UpdateUserDto } from './dto';
+import { AddFavoriteFilmDto, AddWatchlistFilmDto, UpdateUserDto } from './dto';
 import { UsersService } from './users.service';
 
 @ApiTags('Users Endpoints')
@@ -40,5 +41,23 @@ export class UsersController {
     @Param('username') username: string,
   ) {
     return this.usersService.deleteProfile(userId, username);
+  }
+
+  @Put('films/favorites')
+  @UseGuards(AccessTokenGuard)
+  async addFavoriteFilm(
+    @User('sub') userId: string,
+    @Body() dto: AddFavoriteFilmDto,
+  ) {
+    return this.usersService.addFavoriteFilm(userId, dto);
+  }
+
+  @Put('films/watchlist')
+  @UseGuards(AccessTokenGuard)
+  async addFilmToWatchlist(
+    @User('sub') userId: string,
+    @Body() dto: AddWatchlistFilmDto,
+  ) {
+    return this.usersService.addWatchlistFilm(userId, dto);
   }
 }
