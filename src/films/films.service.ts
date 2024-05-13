@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AddFilmDto, UpdateFilmDto } from './dto';
+import { AddFilmDto, AddUserFilmReviuwDto, UpdateFilmDto } from './dto';
 
 @Injectable()
 export class FilmsService {
@@ -303,6 +303,75 @@ export class FilmsService {
     await this.prisma.userFilmWatchlist.delete({
       where: {
         id: existingWatchlist.id,
+      },
+    });
+  }
+
+  async addFilmReview(
+    userId: string,
+    filmId: string,
+    dto: AddUserFilmReviuwDto,
+  ) {
+    // Check if the film exists
+    const film = await this.findById(filmId);
+    if (!film) {
+      throw new NotFoundException('Film not found');
+    }
+
+    // Check if the user added review to the film
+    const existingReview = await this.prisma.userFilmReview.findFirst({
+      where: {
+        user_id: userId,
+        film_id: filmId,
+      },
+    });
+    if (existingReview) {
+      throw new BadRequestException('Review already added');
+    }
+
+    // Check if the rating is floating point
+    if (!Number.isInteger(dto.rating)) {
+      throw new BadRequestException('Rating must be an integer');
+    }
+
+    // Check if the rating is between 1 and 5
+    if (dto.rating < 1 || dto.rating > 5) {
+      throw new BadRequestException('Rating must be between 1 and 5');
+    }
+
+    // Add the review to the film
+    await this.prisma.userFilmReview.create({
+      data: {
+        user_id: userId,
+        film_id: filmId,
+        rating: dto.rating,
+        review: dto.review,
+      },
+    });
+  }
+
+  async removeFilmReview(userId: string, filmId: string) {
+    // Check if the film exists
+    const film = await this.findById(filmId);
+    if (!film) {
+      throw new NotFoundException('Film not found');
+    }
+
+    // Check if the user added review to the film
+    const existingReview = await this.prisma.userFilmReview.findFirst({
+      where: {
+        user_id: userId,
+        film_id: filmId,
+      },
+    });
+    if (!existingReview) {
+      throw new BadRequestException('Review not found');
+    }
+
+    // Remove the review from the film
+    await this.prisma.userFilmReview.delete({
+      where: {
+        id: existingReview.id,
       },
     });
   }

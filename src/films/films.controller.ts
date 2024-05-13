@@ -13,7 +13,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { Roles, User } from 'src/common/decorators';
 import { Role } from 'src/common/enums';
 import { AccessTokenGuard, RolesGuard } from 'src/common/guards';
-import { AddFilmDto, UpdateFilmDto } from './dto';
+import { AddFilmDto, AddUserFilmReviuwDto, UpdateFilmDto } from './dto';
 import { FilmsService } from './films.service';
 
 @ApiTags('Films Endpoints')
@@ -101,5 +101,24 @@ export class FilmsController {
     @Param('filmId') filmId: string,
   ) {
     return this.filmsService.removeWatchlistFilm(userId, filmId);
+  }
+
+  @Put('users/reviews/:filmId')
+  @UseGuards(AccessTokenGuard)
+  async addFilmReview(
+    @User('sub') userId: string,
+    @Param('filmId') filmId: string,
+    @Body() dto: AddUserFilmReviuwDto,
+  ) {
+    return this.filmsService.addFilmReview(userId, filmId, dto);
+  }
+
+  @Delete('users/reviews/:filmId')
+  @UseGuards(AccessTokenGuard)
+  async removeFilmReview(
+    @User('sub') userId: string,
+    @Param('filmId') filmId: string,
+  ) {
+    return this.filmsService.removeFilmReview(userId, filmId);
   }
 }
