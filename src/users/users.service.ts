@@ -56,15 +56,49 @@ export class UsersService {
   }
 
   async displayProfile(username: string) {
+    // Check if the user exists
     const user = await this.findByUsername(username);
-
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
+    // Get user film favorites list
+    const favorites = await this.prisma.userFilmFavorite.findMany({
+      where: {
+        user_id: user.id,
+      },
+      select: {
+        film: {
+          select: {
+            id: true,
+            title: true,
+            poster: true,
+          },
+        },
+      },
+    });
+
+    // Get user film watchlist
+    const watchlist = await this.prisma.userFilmWatchlist.findMany({
+      where: {
+        user_id: user.id,
+      },
+      select: {
+        film: {
+          select: {
+            id: true,
+            title: true,
+            poster: true,
+          },
+        },
+      },
+    });
+
     return {
       username: user.username,
       biography: user.biography,
+      favoritesFilm: favorites,
+      watchlistFilm: watchlist,
     };
   }
 
