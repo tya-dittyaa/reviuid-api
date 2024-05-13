@@ -32,6 +32,38 @@ export class FilmsService {
     });
   }
 
+  async calculateTotalRating(filmId: string) {
+    const totalRating = await this.prisma.userFilmReview.aggregate({
+      where: {
+        film_id: filmId,
+      },
+      _sum: {
+        rating: true,
+      },
+    });
+
+    const totalReviews = await this.prisma.userFilmReview.count({
+      where: {
+        film_id: filmId,
+      },
+    });
+
+    const rating =
+      totalReviews !== 0 && !isNaN(totalRating._sum.rating)
+        ? totalRating._sum.rating / totalReviews
+        : 0;
+
+    await this.prisma.films.update({
+      where: {
+        id: filmId,
+      },
+      data: {
+        rating: rating,
+        totalRatings: totalReviews,
+      },
+    });
+  }
+
   async calculateTotalFavorites(filmId: string) {
     const totalFavorites = await this.prisma.userFilmFavorite.count({
       where: {
@@ -371,6 +403,9 @@ export class FilmsService {
         review: dto.review,
       },
     });
+
+    // Calculate the total rating for the film
+    await this.calculateTotalRating(filmId);
   }
 
   async removeFilmReview(userId: string, filmId: string) {
@@ -397,5 +432,8 @@ export class FilmsService {
         id: existingReview.id,
       },
     });
+
+    // Calculate the total rating for the film
+    await this.calculateTotalRating(filmId);
   }
 }
