@@ -11,7 +11,7 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { User } from 'src/common/decorators';
 import { AccessTokenGuard } from 'src/common/guards';
-import { AddFavoriteFilmDto, AddWatchlistFilmDto, UpdateUserDto } from './dto';
+import { UpdateUserDto } from './dto';
 import { UsersService } from './users.service';
 
 @ApiTags('Users Endpoints')
@@ -43,21 +43,39 @@ export class UsersController {
     return this.usersService.deleteProfile(userId, username);
   }
 
-  @Put('films/favorites')
+  @Put('films/favorites/:filmId')
   @UseGuards(AccessTokenGuard)
   async addFavoriteFilm(
     @User('sub') userId: string,
-    @Body() dto: AddFavoriteFilmDto,
+    @Param('filmId') filmId: string,
   ) {
-    return this.usersService.addFavoriteFilm(userId, dto);
+    return this.usersService.addFavoriteFilm(userId, filmId);
   }
 
-  @Put('films/watchlist')
+  @Put('films/watchlist/:filmId')
   @UseGuards(AccessTokenGuard)
   async addFilmToWatchlist(
     @User('sub') userId: string,
-    @Body() dto: AddWatchlistFilmDto,
+    @Param('filmId') filmId: string,
   ) {
-    return this.usersService.addWatchlistFilm(userId, dto);
+    return this.usersService.addWatchlistFilm(userId, filmId);
+  }
+
+  @Delete('films/favorites/:filmId')
+  @UseGuards(AccessTokenGuard)
+  async removeFavoriteFilm(
+    @User('sub') userId: string,
+    @Param('filmId') filmId: string,
+  ) {
+    return this.usersService.removeFavoriteFilm(userId, filmId);
+  }
+
+  @Delete('films/watchlist/:filmId')
+  @UseGuards(AccessTokenGuard)
+  async removeWatchlistFilm(
+    @User('sub') userId: string,
+    @Param('filmId') filmId: string,
+  ) {
+    return this.usersService.removeWatchlistFilm(userId, filmId);
   }
 }

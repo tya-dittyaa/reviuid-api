@@ -7,7 +7,7 @@ import {
 import { Prisma } from '@prisma/client';
 import { FilmsService } from 'src/films/films.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AddFavoriteFilmDto, AddWatchlistFilmDto, UpdateUserDto } from './dto';
+import { UpdateUserDto } from './dto';
 
 @Injectable()
 export class UsersService {
@@ -167,9 +167,9 @@ export class UsersService {
     });
   }
 
-  async addFavoriteFilm(userId: string, dto: AddFavoriteFilmDto) {
+  async addFavoriteFilm(userId: string, filmId: string) {
     // Check if the film exists
-    const film = await this.filmsService.findById(dto.filmId);
+    const film = await this.filmsService.findById(filmId);
     if (!film) {
       throw new NotFoundException('Film not found');
     }
@@ -178,7 +178,7 @@ export class UsersService {
     const existingFavorite = await this.prisma.userFilmFavorite.findFirst({
       where: {
         user_id: userId,
-        film_id: dto.filmId,
+        film_id: filmId,
       },
     });
     if (existingFavorite) {
@@ -189,14 +189,14 @@ export class UsersService {
     await this.prisma.userFilmFavorite.create({
       data: {
         user_id: userId,
-        film_id: dto.filmId,
+        film_id: filmId,
       },
     });
   }
 
-  async addWatchlistFilm(userId: string, dto: AddWatchlistFilmDto) {
+  async addWatchlistFilm(userId: string, filmId: string) {
     // Check if the film exists
-    const film = await this.filmsService.findById(dto.filmId);
+    const film = await this.filmsService.findById(filmId);
     if (!film) {
       throw new NotFoundException('Film not found');
     }
@@ -205,7 +205,7 @@ export class UsersService {
     const existingWatchlist = await this.prisma.userFilmWatchlist.findFirst({
       where: {
         user_id: userId,
-        film_id: dto.filmId,
+        film_id: filmId,
       },
     });
     if (existingWatchlist) {
@@ -216,7 +216,59 @@ export class UsersService {
     await this.prisma.userFilmWatchlist.create({
       data: {
         user_id: userId,
-        film_id: dto.filmId,
+        film_id: filmId,
+      },
+    });
+  }
+
+  async removeFavoriteFilm(userId: string, filmId: string) {
+    // Check if the film exists
+    const film = await this.filmsService.findById(filmId);
+    if (!film) {
+      throw new NotFoundException('Film not found');
+    }
+
+    // Check if the user added the film to favorites
+    const existingFavorite = await this.prisma.userFilmFavorite.findFirst({
+      where: {
+        user_id: userId,
+        film_id: filmId,
+      },
+    });
+    if (!existingFavorite) {
+      throw new BadRequestException('Film not added to favorites');
+    }
+
+    // Remove the film from the user's favorite films
+    await this.prisma.userFilmFavorite.delete({
+      where: {
+        id: existingFavorite.id,
+      },
+    });
+  }
+
+  async removeWatchlistFilm(userId: string, filmId: string) {
+    // Check if the film exists
+    const film = await this.filmsService.findById(filmId);
+    if (!film) {
+      throw new NotFoundException('Film not found');
+    }
+
+    // Check if the user added the film to watchlist
+    const existingWatchlist = await this.prisma.userFilmWatchlist.findFirst({
+      where: {
+        user_id: userId,
+        film_id: filmId,
+      },
+    });
+    if (!existingWatchlist) {
+      throw new BadRequestException('Film not added to watchlist');
+    }
+
+    // Remove the film from the user's watchlist
+    await this.prisma.userFilmWatchlist.delete({
+      where: {
+        id: existingWatchlist.id,
       },
     });
   }
