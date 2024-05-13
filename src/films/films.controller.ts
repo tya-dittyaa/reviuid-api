@@ -6,10 +6,11 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Roles } from 'src/common/decorators';
+import { Roles, User } from 'src/common/decorators';
 import { Role } from 'src/common/enums';
 import { AccessTokenGuard, RolesGuard } from 'src/common/guards';
 import { AddFilmDto, UpdateFilmDto } from './dto';
@@ -64,5 +65,41 @@ export class FilmsController {
   @Get('coming-soon')
   async getComingSoon() {
     return this.filmsService.getComingSoon();
+  }
+
+  @Put('users/favorites/:filmId')
+  @UseGuards(AccessTokenGuard)
+  async addFavoriteFilm(
+    @User('sub') userId: string,
+    @Param('filmId') filmId: string,
+  ) {
+    return this.filmsService.addFavoriteFilm(userId, filmId);
+  }
+
+  @Put('users/watchlist/:filmId')
+  @UseGuards(AccessTokenGuard)
+  async addFilmToWatchlist(
+    @User('sub') userId: string,
+    @Param('filmId') filmId: string,
+  ) {
+    return this.filmsService.addWatchlistFilm(userId, filmId);
+  }
+
+  @Delete('users/favorites/:filmId')
+  @UseGuards(AccessTokenGuard)
+  async removeFavoriteFilm(
+    @User('sub') userId: string,
+    @Param('filmId') filmId: string,
+  ) {
+    return this.filmsService.removeFavoriteFilm(userId, filmId);
+  }
+
+  @Delete('users/watchlist/:filmId')
+  @UseGuards(AccessTokenGuard)
+  async removeWatchlistFilm(
+    @User('sub') userId: string,
+    @Param('filmId') filmId: string,
+  ) {
+    return this.filmsService.removeWatchlistFilm(userId, filmId);
   }
 }
