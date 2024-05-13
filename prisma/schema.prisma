@@ -46,7 +46,7 @@ model Films {
   trailer  String
 
   rating         Float @default(0)
-  totalRatings    Int   @default(0)
+  totalRatings   Int   @default(0)
   totalFavorites Int   @default(0)
 
   releaseDate DateTime
