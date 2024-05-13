@@ -45,7 +45,8 @@ model Films {
   poster   String
   trailer  String
 
-  totalRating    Float @default(0)
+  rating         Float @default(0)
+  totalRatings    Int   @default(0)
   totalFavorites Int   @default(0)
 
   releaseDate DateTime

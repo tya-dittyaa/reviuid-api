@@ -32,6 +32,23 @@ export class FilmsService {
     });
   }
 
+  async calculateTotalFavorites(filmId: string) {
+    const totalFavorites = await this.prisma.userFilmFavorite.count({
+      where: {
+        film_id: filmId,
+      },
+    });
+
+    await this.prisma.films.update({
+      where: {
+        id: filmId,
+      },
+      data: {
+        totalFavorites,
+      },
+    });
+  }
+
   async getFilm(id: string) {
     // Check if the film exists
     const film = await this.findById(id);
@@ -140,7 +157,7 @@ export class FilmsService {
     const list = await this.prisma.films.findMany({
       take: 10,
       orderBy: {
-        totalRating: 'desc',
+        rating: 'desc',
       },
       select: {
         id: true,
@@ -226,6 +243,9 @@ export class FilmsService {
         film_id: filmId,
       },
     });
+
+    // Calculate the total favorites for the film
+    await this.calculateTotalFavorites(filmId);
   }
 
   async removeFavoriteFilm(userId: string, filmId: string) {
@@ -252,6 +272,9 @@ export class FilmsService {
         id: existingFavorite.id,
       },
     });
+
+    // Calculate the total favorites for the film
+    await this.calculateTotalFavorites(filmId);
   }
 
   async addWatchlistFilm(userId: string, filmId: string) {
