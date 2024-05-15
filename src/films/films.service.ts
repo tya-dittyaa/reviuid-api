@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AddFilmDto, AddUserFilmReviuwDto, UpdateFilmDto } from './dto';
+import { AddFilmDto, AddUserFilmReviewDto, UpdateFilmDto } from './dto';
 
 @Injectable()
 export class FilmsService {
@@ -365,7 +365,7 @@ export class FilmsService {
   async addFilmReview(
     userId: string,
     filmId: string,
-    dto: AddUserFilmReviuwDto,
+    dto: AddUserFilmReviewDto,
   ) {
     // Check if the film exists
     const film = await this.findById(filmId);
