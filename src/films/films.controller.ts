@@ -13,7 +13,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { Roles, User } from 'src/common/decorators';
 import { Role } from 'src/common/enums';
 import { AccessTokenGuard, RolesGuard } from 'src/common/guards';
-import { AddFilmDto, AddUserFilmReviuwDto, UpdateFilmDto } from './dto';
+import { AddFilmDto, AddUserFilmReviewDto, UpdateFilmDto } from './dto';
 import { FilmsService } from './films.service';
 
 @ApiTags('Films Endpoints')
@@ -108,7 +108,7 @@ export class FilmsController {
   async addFilmReview(
     @User('sub') userId: string,
     @Param('filmId') filmId: string,
-    @Body() dto: AddUserFilmReviuwDto,
+    @Body() dto: AddUserFilmReviewDto,
   ) {
     return this.filmsService.addFilmReview(userId, filmId, dto);
   }
