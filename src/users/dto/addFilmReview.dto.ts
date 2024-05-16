@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, IsString, Length } from 'class-validator';
 
-export class AddUserFilmReviewDto {
+export class AddFilmReviewDto {
   @IsNotEmpty()
   @IsNumber()
   rating: number;

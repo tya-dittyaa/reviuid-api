@@ -1,6 +1,5 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Request } from 'express';
 import { User } from 'src/common/decorators';
 import { AccessTokenGuard, RefreshTokenGuard } from 'src/common/guards';
 import { JwtPayloadData } from '../common/types';
@@ -24,8 +23,8 @@ export class AuthController {
 
   @Get('signout')
   @UseGuards(AccessTokenGuard)
-  async signout(@Req() req: Request) {
-    return this.authService.signOut(req.user['sub']);
+  async signout(@User('sub') userId: string) {
+    return this.authService.signOut(userId);
   }
 
   @Get('refresh')
