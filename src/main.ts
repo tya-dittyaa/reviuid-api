@@ -15,6 +15,8 @@ async function bootstrap() {
     .setTitle('Reviu.ID API Documentation')
     .setDescription('The Reviu.ID API Documentation for the backend service.')
     .setVersion('0.0.1')
+    .addServer('http://localhost:4001', 'Development Server')
+    .addServer('https://api-reviuid.dittyaa.my.id', 'Production Server')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
