@@ -1,5 +1,0 @@
-apps:
-  - script: ./dist/main
-    env_production:
-      name: 'reviuid-api'
-      NODE_ENV: production
