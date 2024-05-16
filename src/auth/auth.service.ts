@@ -52,7 +52,7 @@ export class AuthService {
     });
 
     // token
-    const tokens = await this.getTokens(newUser);
+    const tokens = await this.getUserTokens(newUser);
     await this.updateRefreshToken(newUser.id, tokens.refreshToken);
 
     return tokens;
@@ -72,7 +72,7 @@ export class AuthService {
     }
 
     // token
-    const tokens = await this.getTokens(user);
+    const tokens = await this.getUserTokens(user);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
     return tokens;
@@ -105,7 +105,7 @@ export class AuthService {
     }
 
     // token
-    const tokens = await this.getTokens(user);
+    const tokens = await this.getUserTokens(user);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
     return tokens;
@@ -118,7 +118,7 @@ export class AuthService {
     });
   }
 
-  async getTokens(user: Users) {
+  async getUserTokens(user: Users) {
     const jwtPayload: JwtPayloadCreate = {
       sub: user.id,
       email: user.email,
