@@ -43,7 +43,7 @@ export class UsersController {
     return this.usersService.deleteProfile(userId, username);
   }
 
-  @Put('films/favorites/:filmId')
+  @Put('favorites/:filmId')
   @UseGuards(AccessTokenGuard)
   async addFavoriteFilm(
     @User('sub') userId: string,
@@ -52,7 +52,7 @@ export class UsersController {
     return this.usersService.addFavoriteFilm(userId, filmId);
   }
 
-  @Delete('films/favorites/:filmId')
+  @Delete('favorites/:filmId')
   @UseGuards(AccessTokenGuard)
   async removeFavoriteFilm(
     @User('sub') userId: string,
@@ -61,7 +61,7 @@ export class UsersController {
     return this.usersService.removeFavoriteFilm(userId, filmId);
   }
 
-  @Put('films/watchlist/:filmId')
+  @Put('watchlist/:filmId')
   @UseGuards(AccessTokenGuard)
   async addFilmToWatchlist(
     @User('sub') userId: string,
@@ -70,7 +70,7 @@ export class UsersController {
     return this.usersService.addWatchlistFilm(userId, filmId);
   }
 
-  @Delete('films/watchlist/:filmId')
+  @Delete('watchlist/:filmId')
   @UseGuards(AccessTokenGuard)
   async removeWatchlistFilm(
     @User('sub') userId: string,
@@ -79,7 +79,7 @@ export class UsersController {
     return this.usersService.removeWatchlistFilm(userId, filmId);
   }
 
-  @Put('films/reviews/:filmId')
+  @Put('reviews/:filmId')
   @UseGuards(AccessTokenGuard)
   async addFilmReview(
     @User('sub') userId: string,
@@ -89,7 +89,7 @@ export class UsersController {
     return this.usersService.addFilmReview(userId, filmId, dto);
   }
 
-  @Delete('films/reviews/:filmId')
+  @Delete('reviews/:filmId')
   @UseGuards(AccessTokenGuard)
   async removeFilmReview(
     @User('sub') userId: string,
