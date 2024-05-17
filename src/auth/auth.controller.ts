@@ -30,6 +30,6 @@ export class AuthController {
   @Get('refresh')
   @UseGuards(RefreshTokenGuard)
   async refresh(@User() user: JwtPayloadData) {
-    return this.authService.refreshTokens(user.sub, user.refreshToken);
+    return this.authService.refreshUserTokens(user.sub, user.refreshToken);
   }
 }
