@@ -31,20 +31,20 @@ export class FilmsController {
     return this.filmsService.addFilm(dto);
   }
 
-  @Get(':id')
+  @Get('search/:id')
   @UseGuards(HeaderApiKeyGuard)
   async getFilm(@Param('id') id: string) {
     return this.filmsService.getFilm(id);
   }
 
-  @Patch(':id')
+  @Patch('update/:id')
   @Roles(Role.Admin)
   @UseGuards(HeaderApiKeyGuard, AccessTokenGuard, RolesGuard)
   async updateFilm(@Param('id') id: string, @Body() dto: UpdateFilmDto) {
     return this.filmsService.updateFilm(id, dto);
   }
 
-  @Delete(':id')
+  @Delete('delete/:id')
   @Roles(Role.Admin)
   @UseGuards(HeaderApiKeyGuard, AccessTokenGuard, RolesGuard)
   async deleteFilm(@Param('id') id: string) {
