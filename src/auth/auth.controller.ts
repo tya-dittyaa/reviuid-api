@@ -15,25 +15,25 @@ import { SigninDto, SignupDto } from './dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('users/signup')
+  @Post('user/signup')
   @UseGuards(HeaderApiKeyGuard)
   async signup(@Body() dto: SignupDto) {
     return this.authService.signUp(dto);
   }
 
-  @Post('users/signin')
+  @Post('user/signin')
   @UseGuards(HeaderApiKeyGuard)
   async signin(@Body() dto: SigninDto) {
     return this.authService.signIn(dto);
   }
 
-  @Get('users/signout')
+  @Get('user/signout')
   @UseGuards(AccessTokenGuard)
   async signout(@User('sub') userId: string) {
     return this.authService.signOut(userId);
   }
 
-  @Get('users/refresh')
+  @Get('user/refresh')
   @UseGuards(RefreshTokenGuard)
   async refresh(@User() user: JwtPayloadData) {
     return this.authService.refreshUserTokens(user.sub, user.refreshToken);
