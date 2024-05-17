@@ -1,12 +1,14 @@
 import {
   BadRequestException,
-  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { google } from 'googleapis';
+import { join } from 'path';
 import { FilmsService } from 'src/films/films.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { PassThrough } from 'stream';
 import { AddFilmReviewDto, UpdateUserDto } from './dto';
 
 @Injectable()
@@ -55,63 +57,35 @@ export class UsersService {
     });
   }
 
-  async displayProfile(username: string) {
-    // Check if the user exists
+  async delete(userId: string) {
+    return this.prisma.users.delete({
+      where: {
+        id: userId,
+      },
+    });
+  }
+
+  async searchUser(username: string) {
+    // Search for users by username
     const user = await this.findByUsername(username);
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
-
-    // Get user film favorites list
-    const favorites = await this.prisma.userFilmFavorite.findMany({
-      where: {
-        user_id: user.id,
-      },
-      select: {
-        film: {
-          select: {
-            id: true,
-            title: true,
-            poster: true,
-          },
-        },
-      },
-    });
-
-    // Get user film watchlist
-    const watchlist = await this.prisma.userFilmWatchlist.findMany({
-      where: {
-        user_id: user.id,
-      },
-      select: {
-        film: {
-          select: {
-            id: true,
-            title: true,
-            poster: true,
-          },
-        },
-      },
-    });
 
     return {
       username: user.username,
       biography: user.biography,
-      favoritesFilm: favorites,
-      watchlistFilm: watchlist,
+      avatar: user.avatar,
     };
   }
 
-  async updateProfile(userId: string, username: string, dto: UpdateUserDto) {
+  async updateProfile(userId: string, dto: UpdateUserDto) {
     // Check if the user exists
-    const user = await this.findByUsername(username);
+    const user = await this.findById(userId);
 
     if (!user) {
       throw new NotFoundException('User not found');
-    }
-
-    if (user.id !== userId) {
-      throw new ForbiddenException('You are not allowed to update this user');
     }
 
     // Check if the data contains invalid fields
@@ -147,24 +121,99 @@ export class UsersService {
     await this.update(userId, dto);
   }
 
-  async deleteProfile(userId: string, username: string) {
+  async updateAvatar(userId: string, avatar: Express.Multer.File) {
     // Check if the user exists
-    const user = await this.findByUsername(username);
+    const user = await this.findById(userId);
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    if (user.id !== userId) {
-      throw new ForbiddenException('You are not allowed to delete this user');
+    // Check if no avatar is uploaded
+    if (!avatar) {
+      throw new BadRequestException('No avatar uploaded');
+    }
+
+    // Check if the avatar is an image
+    if (!avatar.mimetype.startsWith('image')) {
+      throw new BadRequestException('Avatar must be an image');
+    }
+
+    // Google drive configuration
+    const KEYFILEPATH = join(__dirname, '../../gdrive.credentials.json');
+    const SCOPES = ['https://www.googleapis.com/auth/drive'];
+    const PARENTFOLDER = '1zS9aZeHM8xc93rzTm1iwVi-4nnvCmrIf';
+
+    // Google Auth
+    const auth = new google.auth.GoogleAuth({
+      keyFile: KEYFILEPATH,
+      scopes: SCOPES,
+    });
+
+    // Buffer stream
+    const bufferStream = new PassThrough();
+    bufferStream.end(avatar.buffer);
+
+    // Google Drive client
+    const drive = google.drive({
+      version: 'v3',
+      auth,
+    });
+
+    // Remove old avatar file with the same name as userId
+    const existingFiles = await drive.files.list({
+      q: `name='${userId}'`,
+    });
+
+    if (existingFiles.data.files.length > 0) {
+      const fileId = existingFiles.data.files[0].id;
+      await drive.files.delete({
+        fileId,
+      });
+    }
+
+    // Upload avatar to Google Drive
+    const response = await drive.files.create({
+      requestBody: {
+        name: userId,
+        mimeType: avatar.mimetype,
+        parents: [PARENTFOLDER],
+      },
+      media: {
+        mimeType: avatar.mimetype,
+        body: bufferStream,
+      },
+    });
+
+    // Update avatar on database
+    const avatarUrl = `https://lh3.googleusercontent.com/d/${response.data.id}`;
+    await this.update(userId, { avatar: avatarUrl });
+  }
+
+  async deleteProfile(userId: string) {
+    // Check if the user exists
+    const user = await this.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
 
     // Delete the user
-    await this.prisma.users.delete({
-      where: {
-        id: userId,
-      },
-    });
+    await this.delete(userId);
+  }
+
+  async deleteAvatar(userId: string) {
+    // Check if the user exists
+    const user = await this.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Delete the avatar
+    const defaultAvatar =
+      'https://lh3.google.com/u/0/d/1yhM-tDrQwh166RGAqTGzLKPvVri7jAKD';
+    await this.update(userId, { avatar: defaultAvatar });
   }
 
   async addFavoriteFilm(userId: string, filmId: string) {
@@ -306,16 +355,6 @@ export class UsersService {
     if (dto.rating < 1 || dto.rating > 5) {
       throw new BadRequestException('Rating must be between 1 and 5');
     }
-
-    // Add the review to the film
-    await this.prisma.userFilmReview.create({
-      data: {
-        user_id: userId,
-        film_id: filmId,
-        rating: dto.rating,
-        review: dto.review,
-      },
-    });
 
     // Calculate the total rating for the film
     await this.filmsService.calculateTotalRating(filmId);

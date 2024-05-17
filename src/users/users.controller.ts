@@ -5,9 +5,12 @@ import {
   Get,
   Param,
   Patch,
-  Put,
+  Post,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from 'src/common/decorators';
 import { AccessTokenGuard, HeaderApiKeyGuard } from 'src/common/guards';
@@ -19,32 +22,41 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get(':username')
+  @Get('search/:username')
   @UseGuards(HeaderApiKeyGuard)
-  async displayProfile(@Param('username') username: string) {
-    return this.usersService.displayProfile(username);
+  async searchUser(@Param('username') username: string) {
+    return this.usersService.searchUser(username);
   }
 
-  @Patch(':username')
+  @Patch('update/profile')
   @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
-  async updateProfile(
-    @User('sub') userId: string,
-    @Param('username') username: string,
-    @Body() dto: UpdateUserDto,
-  ) {
-    return this.usersService.updateProfile(userId, username, dto);
+  async updateProfile(@User('sub') userId: string, @Body() dto: UpdateUserDto) {
+    return this.usersService.updateProfile(userId, dto);
   }
 
-  @Delete(':username')
+  @Patch('update/avatar')
   @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
-  async deleteProfile(
+  @UseInterceptors(FileInterceptor('avatar'))
+  async updateAvatar(
     @User('sub') userId: string,
-    @Param('username') username: string,
+    @UploadedFile() avatar: Express.Multer.File,
   ) {
-    return this.usersService.deleteProfile(userId, username);
+    return this.usersService.updateAvatar(userId, avatar);
   }
 
-  @Put('favorite/:filmId')
+  @Delete('delete/profile')
+  @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
+  async deleteProfile(@User('sub') userId: string) {
+    return this.usersService.deleteProfile(userId);
+  }
+
+  @Delete('delete/avatar')
+  @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
+  async deleteAvatar(@User('sub') userId: string) {
+    return this.usersService.deleteAvatar(userId);
+  }
+
+  @Post('favorite/:filmId')
   @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
   async addFavoriteFilm(
     @User('sub') userId: string,
@@ -62,7 +74,7 @@ export class UsersController {
     return this.usersService.removeFavoriteFilm(userId, filmId);
   }
 
-  @Put('watchlist/:filmId')
+  @Post('watchlist/:filmId')
   @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
   async addFilmToWatchlist(
     @User('sub') userId: string,
@@ -80,7 +92,7 @@ export class UsersController {
     return this.usersService.removeWatchlistFilm(userId, filmId);
   }
 
-  @Put('review/:filmId')
+  @Post('review/:filmId')
   @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
   async addFilmReview(
     @User('sub') userId: string,

@@ -22,6 +22,7 @@ model Users {
   refreshToken String?
 
   username  String  @unique
+  avatar    String  @default("https://lh3.google.com/u/0/d/1yhM-tDrQwh166RGAqTGzLKPvVri7jAKD")
   biography String?
 
   createdAt DateTime @default(now())
