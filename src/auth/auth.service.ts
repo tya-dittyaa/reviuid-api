@@ -91,7 +91,7 @@ export class AuthService {
     });
   }
 
-  async refreshTokens(userId: string, refreshToken: string) {
+  async refreshUserTokens(userId: string, refreshToken: string) {
     // check if user exists
     const user = await this.usersService.findById(userId);
     if (!user || !user.refreshToken) {
@@ -121,7 +121,6 @@ export class AuthService {
   async getUserTokens(user: Users) {
     const jwtPayload: JwtPayloadCreate = {
       sub: user.id,
-      email: user.email,
       username: user.username,
       role: user.role,
     };

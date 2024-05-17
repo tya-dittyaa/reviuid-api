@@ -1,7 +1,11 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from 'src/common/decorators';
-import { AccessTokenGuard, RefreshTokenGuard } from 'src/common/guards';
+import {
+  AccessTokenGuard,
+  HeaderApiKeyGuard,
+  RefreshTokenGuard,
+} from 'src/common/guards';
 import { JwtPayloadData } from '../common/types';
 import { AuthService } from './auth.service';
 import { SigninDto, SignupDto } from './dto';
@@ -11,25 +15,27 @@ import { SigninDto, SignupDto } from './dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('signup')
+  @Post('user/signup')
+  @UseGuards(HeaderApiKeyGuard)
   async signup(@Body() dto: SignupDto) {
     return this.authService.signUp(dto);
   }
 
-  @Post('signin')
+  @Post('user/signin')
+  @UseGuards(HeaderApiKeyGuard)
   async signin(@Body() dto: SigninDto) {
     return this.authService.signIn(dto);
   }
 
-  @Get('signout')
+  @Get('user/signout')
   @UseGuards(AccessTokenGuard)
   async signout(@User('sub') userId: string) {
     return this.authService.signOut(userId);
   }
 
-  @Get('refresh')
+  @Get('user/refresh')
   @UseGuards(RefreshTokenGuard)
   async refresh(@User() user: JwtPayloadData) {
-    return this.authService.refreshTokens(user.sub, user.refreshToken);
+    return this.authService.refreshUserTokens(user.sub, user.refreshToken);
   }
 }

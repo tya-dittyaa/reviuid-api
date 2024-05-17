@@ -94,10 +94,7 @@ export class FilmsService {
     delete film.releaseDate;
     delete film.finishDate;
 
-    return {
-      film,
-      userReviews: [],
-    };
+    return film;
   }
 
   async updateFilm(id: string, dto: UpdateFilmDto) {
