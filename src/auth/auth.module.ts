@@ -6,7 +6,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import {
   AccessTokenStrategy,
-  AuthBasicStrategy,
+  HeaderApiKeyStrategy,
   RefreshTokenStrategy,
 } from './strategies';
 
@@ -17,7 +17,7 @@ import {
     AuthService,
     AccessTokenStrategy,
     RefreshTokenStrategy,
-    AuthBasicStrategy,
+    HeaderApiKeyStrategy,
   ],
 })
 export class AuthModule {}

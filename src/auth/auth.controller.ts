@@ -1,7 +1,11 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from 'src/common/decorators';
-import { AccessTokenGuard, RefreshTokenGuard } from 'src/common/guards';
+import {
+  AccessTokenGuard,
+  HeaderApiKeyGuard,
+  RefreshTokenGuard,
+} from 'src/common/guards';
 import { JwtPayloadData } from '../common/types';
 import { AuthService } from './auth.service';
 import { SigninDto, SignupDto } from './dto';
@@ -12,11 +16,13 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
+  @UseGuards(HeaderApiKeyGuard)
   async signup(@Body() dto: SignupDto) {
     return this.authService.signUp(dto);
   }
 
   @Post('signin')
+  @UseGuards(HeaderApiKeyGuard)
   async signin(@Body() dto: SigninDto) {
     return this.authService.signIn(dto);
   }
