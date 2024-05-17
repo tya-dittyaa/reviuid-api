@@ -216,6 +216,66 @@ export class UsersService {
     await this.update(userId, { avatar: defaultAvatar });
   }
 
+  async getFavoriteFilms(username: string) {
+    // Check if the user exists
+    const user = await this.findByUsername(username);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Get the user's favorite films
+    const favoriteFilms = await this.prisma.userFilmFavorite.findMany({
+      where: {
+        user_id: user.id,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        film: {
+          select: {
+            id: true,
+            title: true,
+            poster: true,
+          },
+        },
+      },
+    });
+
+    return favoriteFilms.map((favorite) => favorite.film);
+  }
+
+  async getWatchlistFilms(username: string) {
+    // Check if the user exists
+    const user = await this.findByUsername(username);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Get the user's watchlist films
+    const watchlistFilms = await this.prisma.userFilmWatchlist.findMany({
+      where: {
+        user_id: user.id,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        film: {
+          select: {
+            id: true,
+            title: true,
+            poster: true,
+          },
+        },
+      },
+    });
+
+    return watchlistFilms.map((watchlist) => watchlist.film);
+  }
+
   async addFavoriteFilm(userId: string, filmId: string) {
     // Check if the film exists
     const film = await this.filmsService.findById(filmId);

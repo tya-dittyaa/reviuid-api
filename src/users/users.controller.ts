@@ -56,6 +56,18 @@ export class UsersController {
     return this.usersService.deleteAvatar(userId);
   }
 
+  @Get('display/favorite/:username')
+  @UseGuards(HeaderApiKeyGuard)
+  async getFavoriteFilms(@Param('username') username: string) {
+    return this.usersService.getFavoriteFilms(username);
+  }
+
+  @Get('display/watchlist/:username')
+  @UseGuards(HeaderApiKeyGuard)
+  async getWatchlistFilms(@Param('username') username: string) {
+    return this.usersService.getWatchlistFilms(username);
+  }
+
   @Post('favorite/:filmId')
   @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
   async addFavoriteFilm(
