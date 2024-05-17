@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from 'src/common/decorators';
-import { AccessTokenGuard } from 'src/common/guards';
+import { AccessTokenGuard, HeaderApiKeyGuard } from 'src/common/guards';
 import { AddFilmReviewDto, UpdateUserDto } from './dto';
 import { UsersService } from './users.service';
 
@@ -20,12 +20,13 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get(':username')
+  @UseGuards(HeaderApiKeyGuard)
   async displayProfile(@Param('username') username: string) {
     return this.usersService.displayProfile(username);
   }
 
   @Patch(':username')
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
   async updateProfile(
     @User('sub') userId: string,
     @Param('username') username: string,
@@ -35,7 +36,7 @@ export class UsersController {
   }
 
   @Delete(':username')
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
   async deleteProfile(
     @User('sub') userId: string,
     @Param('username') username: string,
@@ -43,8 +44,8 @@ export class UsersController {
     return this.usersService.deleteProfile(userId, username);
   }
 
-  @Put('favorites/:filmId')
-  @UseGuards(AccessTokenGuard)
+  @Put('favorite/:filmId')
+  @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
   async addFavoriteFilm(
     @User('sub') userId: string,
     @Param('filmId') filmId: string,
@@ -52,8 +53,8 @@ export class UsersController {
     return this.usersService.addFavoriteFilm(userId, filmId);
   }
 
-  @Delete('favorites/:filmId')
-  @UseGuards(AccessTokenGuard)
+  @Delete('favorite/:filmId')
+  @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
   async removeFavoriteFilm(
     @User('sub') userId: string,
     @Param('filmId') filmId: string,
@@ -62,7 +63,7 @@ export class UsersController {
   }
 
   @Put('watchlist/:filmId')
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
   async addFilmToWatchlist(
     @User('sub') userId: string,
     @Param('filmId') filmId: string,
@@ -71,7 +72,7 @@ export class UsersController {
   }
 
   @Delete('watchlist/:filmId')
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
   async removeWatchlistFilm(
     @User('sub') userId: string,
     @Param('filmId') filmId: string,
@@ -79,8 +80,8 @@ export class UsersController {
     return this.usersService.removeWatchlistFilm(userId, filmId);
   }
 
-  @Put('reviews/:filmId')
-  @UseGuards(AccessTokenGuard)
+  @Put('review/:filmId')
+  @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
   async addFilmReview(
     @User('sub') userId: string,
     @Param('filmId') filmId: string,
@@ -89,8 +90,8 @@ export class UsersController {
     return this.usersService.addFilmReview(userId, filmId, dto);
   }
 
-  @Delete('reviews/:filmId')
-  @UseGuards(AccessTokenGuard)
+  @Delete('review/:filmId')
+  @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
   async removeFilmReview(
     @User('sub') userId: string,
     @Param('filmId') filmId: string,
