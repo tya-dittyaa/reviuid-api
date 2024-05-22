@@ -22,10 +22,22 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get('search/:username')
+  @Get('display/profile/:username')
   @UseGuards(HeaderApiKeyGuard)
-  async searchUser(@Param('username') username: string) {
-    return this.usersService.searchUser(username);
+  async getProfile(@Param('username') username: string) {
+    return this.usersService.getProfile(username);
+  }
+
+  @Get('display/favorite/:username')
+  @UseGuards(HeaderApiKeyGuard)
+  async getFavoriteFilms(@Param('username') username: string) {
+    return this.usersService.getFavoriteFilms(username);
+  }
+
+  @Get('display/watchlist/:username')
+  @UseGuards(HeaderApiKeyGuard)
+  async getWatchlistFilms(@Param('username') username: string) {
+    return this.usersService.getWatchlistFilms(username);
   }
 
   @Patch('update/profile')
@@ -54,18 +66,6 @@ export class UsersController {
   @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
   async deleteAvatar(@User('sub') userId: string) {
     return this.usersService.deleteAvatar(userId);
-  }
-
-  @Get('display/favorite/:username')
-  @UseGuards(HeaderApiKeyGuard)
-  async getFavoriteFilms(@Param('username') username: string) {
-    return this.usersService.getFavoriteFilms(username);
-  }
-
-  @Get('display/watchlist/:username')
-  @UseGuards(HeaderApiKeyGuard)
-  async getWatchlistFilms(@Param('username') username: string) {
-    return this.usersService.getWatchlistFilms(username);
   }
 
   @Post('favorite/:filmId')

@@ -65,7 +65,7 @@ export class UsersService {
     });
   }
 
-  async searchUser(username: string) {
+  async getProfile(username: string) {
     // Search for users by username
     const user = await this.findByUsername(username);
 
@@ -78,6 +78,66 @@ export class UsersService {
       biography: user.biography,
       avatar: user.avatar,
     };
+  }
+
+  async getFavoriteFilms(username: string) {
+    // Check if the user exists
+    const user = await this.findByUsername(username);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Get the user's favorite films
+    const favoriteFilms = await this.prisma.userFilmFavorite.findMany({
+      where: {
+        user_id: user.id,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        film: {
+          select: {
+            id: true,
+            title: true,
+            poster: true,
+          },
+        },
+      },
+    });
+
+    return favoriteFilms.map((favorite) => favorite.film);
+  }
+
+  async getWatchlistFilms(username: string) {
+    // Check if the user exists
+    const user = await this.findByUsername(username);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Get the user's watchlist films
+    const watchlistFilms = await this.prisma.userFilmWatchlist.findMany({
+      where: {
+        user_id: user.id,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        film: {
+          select: {
+            id: true,
+            title: true,
+            poster: true,
+          },
+        },
+      },
+    });
+
+    return watchlistFilms.map((watchlist) => watchlist.film);
   }
 
   async updateProfile(userId: string, dto: UpdateUserDto) {
@@ -214,66 +274,6 @@ export class UsersService {
     const defaultAvatar =
       'https://lh3.google.com/u/0/d/1yhM-tDrQwh166RGAqTGzLKPvVri7jAKD';
     await this.update(userId, { avatar: defaultAvatar });
-  }
-
-  async getFavoriteFilms(username: string) {
-    // Check if the user exists
-    const user = await this.findByUsername(username);
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    // Get the user's favorite films
-    const favoriteFilms = await this.prisma.userFilmFavorite.findMany({
-      where: {
-        user_id: user.id,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      select: {
-        film: {
-          select: {
-            id: true,
-            title: true,
-            poster: true,
-          },
-        },
-      },
-    });
-
-    return favoriteFilms.map((favorite) => favorite.film);
-  }
-
-  async getWatchlistFilms(username: string) {
-    // Check if the user exists
-    const user = await this.findByUsername(username);
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    // Get the user's watchlist films
-    const watchlistFilms = await this.prisma.userFilmWatchlist.findMany({
-      where: {
-        user_id: user.id,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      select: {
-        film: {
-          select: {
-            id: true,
-            title: true,
-            poster: true,
-          },
-        },
-      },
-    });
-
-    return watchlistFilms.map((watchlist) => watchlist.film);
   }
 
   async addFavoriteFilm(userId: string, filmId: string) {
