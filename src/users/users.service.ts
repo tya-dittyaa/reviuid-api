@@ -246,7 +246,7 @@ export class UsersService {
     });
 
     // Update avatar on database
-    const avatarUrl = `https://lh3.googleusercontent.com/d/${response.data.id}`;
+    const avatarUrl = `https://drive.google.com/uc?export=view&id=${response.data.id}`;
     await this.update(userId, { avatar: avatarUrl });
   }
 
