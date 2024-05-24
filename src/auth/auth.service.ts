@@ -75,7 +75,15 @@ export class AuthService {
     const tokens = await this.getUserTokens(user);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
-    return tokens;
+    return {
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
+      tokens,
+    };
   }
 
   async signOut(userId: string) {
@@ -108,7 +116,15 @@ export class AuthService {
     const tokens = await this.getUserTokens(user);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
-    return tokens;
+    return {
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
+      tokens,
+    };
   }
 
   async updateRefreshToken(userId: string, refreshToken: string) {
