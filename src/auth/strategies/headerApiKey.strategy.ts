@@ -17,7 +17,8 @@ export class HeaderApiKeyStrategy extends PassportStrategy(
   async validate(apiKey: string, done: (error: Error, data) => void) {
     try {
       const keyReplace = apiKey.replace('apiKey', '').trim();
-      const isValid = keyReplace === this.configService.get('HEADER_API_KEY');
+      const decodedKey = Buffer.from(keyReplace, 'base64').toString('utf-8');
+      const isValid = decodedKey === this.configService.get('HEADER_API_KEY');
 
       if (!isValid) {
         return done(new UnauthorizedException(), false);
