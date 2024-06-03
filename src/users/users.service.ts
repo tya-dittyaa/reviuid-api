@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { hash } from 'argon2';
 import { google } from 'googleapis';
 import { join } from 'path';
 import { FilmsService } from 'src/films/films.service';
@@ -187,6 +188,12 @@ export class UsersService {
       if (existingEmail) {
         throw new BadRequestException('Email already taken');
       }
+    }
+
+    // Hash the password
+    if (dto.password) {
+      const hashPassword = await hash(dto.password);
+      dto.password = hashPassword;
     }
 
     // Update the user
