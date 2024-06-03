@@ -291,7 +291,7 @@ export class UsersService {
 
     // Delete the avatar
     const defaultAvatar =
-      'https://lh3.google.com/u/0/d/1yhM-tDrQwh166RGAqTGzLKPvVri7jAKD';
+      'https://drive.google.com/uc?export=view&id=1yhM-tDrQwh166RGAqTGzLKPvVri7jAKD';
     await this.update(userId, { avatar: defaultAvatar });
   }
 
