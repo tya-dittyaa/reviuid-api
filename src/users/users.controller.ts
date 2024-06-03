@@ -40,6 +40,18 @@ export class UsersController {
     return this.usersService.getWatchlistFilms(username);
   }
 
+  @Post('check/username')
+  @UseGuards(HeaderApiKeyGuard)
+  async checkUsername(@Body('username') username: string) {
+    return this.usersService.checkUsername(username);
+  }
+
+  @Post('check/email')
+  @UseGuards(HeaderApiKeyGuard)
+  async checkEmail(@Body('email') email: string) {
+    return this.usersService.checkEmail(email);
+  }
+
   @Patch('update/profile')
   @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
   async updateProfile(@User('sub') userId: string, @Body() dto: UpdateUserDto) {
