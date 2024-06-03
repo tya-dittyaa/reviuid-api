@@ -140,6 +140,18 @@ export class UsersService {
     return watchlistFilms.map((watchlist) => watchlist.film);
   }
 
+  async checkUsername(username: string) {
+    // Check if the username is already taken
+    const existingUser = await this.findByUsername(username);
+    return existingUser ? true : false;
+  }
+
+  async checkEmail(email: string) {
+    // Check if the email is already taken
+    const existingEmail = await this.findByEmail(email);
+    return existingEmail ? true : false;
+  }
+
   async updateProfile(userId: string, dto: UpdateUserDto) {
     // Check if the user exists
     const user = await this.findById(userId);
