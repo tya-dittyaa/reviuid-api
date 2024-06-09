@@ -37,6 +37,15 @@ export class FilmsController {
     return this.filmsService.getFilm(id);
   }
 
+  @Get('search/:id/reviews/:page')
+  @UseGuards(HeaderApiKeyGuard)
+  async getFilmReviewsByPage(
+    @Param('id') id: string,
+    @Param('page') page: string,
+  ) {
+    return this.filmsService.getFilmReviewsByPage(id, Number(page));
+  }
+
   @Patch('update/:id')
   @Roles(Role.Admin)
   @UseGuards(HeaderApiKeyGuard, AccessTokenGuard, RolesGuard)

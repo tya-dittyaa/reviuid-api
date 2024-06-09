@@ -116,6 +116,15 @@ export class UsersController {
     return this.usersService.removeWatchlistFilm(userId, filmId);
   }
 
+  @Get('review/:filmId')
+  @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
+  async getFilmReview(
+    @User('sub') userId: string,
+    @Param('filmId') filmId: string,
+  ) {
+    return this.usersService.getFilmReview(userId, filmId);
+  }
+
   @Post('review/:filmId')
   @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
   async addFilmReview(
@@ -124,6 +133,16 @@ export class UsersController {
     @Body() dto: AddFilmReviewDto,
   ) {
     return this.usersService.addFilmReview(userId, filmId, dto);
+  }
+
+  @Patch('review/:filmId')
+  @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
+  async updateFilmReview(
+    @User('sub') userId: string,
+    @Param('filmId') filmId: string,
+    @Body() dto: AddFilmReviewDto,
+  ) {
+    return this.usersService.updateFilmReview(userId, filmId, dto);
   }
 
   @Delete('review/:filmId')
