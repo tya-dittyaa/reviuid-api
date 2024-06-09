@@ -407,6 +407,24 @@ export class UsersService {
     });
   }
 
+  async getFilmReview(userId: string, filmId: string) {
+    // Check if the film exists
+    const film = await this.filmsService.findById(filmId);
+    if (!film) {
+      throw new NotFoundException('Film not found');
+    }
+
+    // Check if the user added review to the film
+    const existingReview = await this.prisma.userFilmReview.findFirst({
+      where: {
+        user_id: userId,
+        film_id: filmId,
+      },
+    });
+
+    return existingReview;
+  }
+
   async addFilmReview(userId: string, filmId: string, dto: AddFilmReviewDto) {
     // Check if the film exists
     const film = await this.filmsService.findById(filmId);
@@ -434,6 +452,63 @@ export class UsersService {
     if (dto.rating < 1 || dto.rating > 5) {
       throw new BadRequestException('Rating must be between 1 and 5');
     }
+
+    // Add the review to the film
+    await this.prisma.userFilmReview.create({
+      data: {
+        user_id: userId,
+        film_id: filmId,
+        review: dto.review,
+        rating: dto.rating,
+      },
+    });
+
+    // Calculate the total rating for the film
+    await this.filmsService.calculateTotalRating(filmId);
+  }
+
+  async updateFilmReview(
+    userId: string,
+    filmId: string,
+    dto: AddFilmReviewDto,
+  ) {
+    // Check if the film exists
+    const film = await this.filmsService.findById(filmId);
+    if (!film) {
+      throw new NotFoundException('Film not found');
+    }
+
+    // Check if the user added review to the film
+    const existingReview = await this.prisma.userFilmReview.findFirst({
+      where: {
+        user_id: userId,
+        film_id: filmId,
+      },
+    });
+    if (!existingReview) {
+      throw new BadRequestException('Review not found');
+    }
+
+    // Check if the rating is floating point
+    if (!Number.isInteger(dto.rating)) {
+      throw new BadRequestException('Rating must be an integer');
+    }
+
+    // Check if the rating is between 1 and 5
+    if (dto.rating < 1 || dto.rating > 5) {
+      throw new BadRequestException('Rating must be between 1 and 5');
+    }
+
+    // Update the review to the film
+    await this.prisma.userFilmReview.update({
+      where: {
+        id: existingReview.id,
+      },
+      data: {
+        review: dto.review,
+        rating: dto.rating,
+      },
+    });
 
     // Calculate the total rating for the film
     await this.filmsService.calculateTotalRating(filmId);

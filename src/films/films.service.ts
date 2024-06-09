@@ -58,8 +58,8 @@ export class FilmsService {
         id: filmId,
       },
       data: {
-        rating: rating,
-        totalRatings: totalReviews,
+        rating,
+        totalReviews,
       },
     });
   }
@@ -95,6 +95,39 @@ export class FilmsService {
     delete film.finishDate;
 
     return film;
+  }
+
+  async getFilmReviewsByPage(id: string, page: number) {
+    // Check if the film exists
+    const film = await this.findById(id);
+    if (!film) {
+      throw new NotFoundException('Film not found');
+    }
+
+    const reviews = await this.prisma.userFilmReview.findMany({
+      where: {
+        film_id: id,
+      },
+      skip: (page - 1) * 10,
+      take: 10,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        rating: true,
+        review: true,
+        user: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+      },
+    });
+
+    return reviews;
   }
 
   async updateFilm(id: string, dto: UpdateFilmDto) {
