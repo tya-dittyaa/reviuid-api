@@ -81,6 +81,59 @@ export class FilmsService {
     });
   }
 
+  async getTotalFilms() {
+    return this.prisma.films.count();
+  }
+
+  async searchFilms(search: string) {
+    const films = await this.prisma.films.findMany({
+      take: 10,
+      where: {
+        OR: [
+          {
+            title: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      },
+      orderBy: {
+        releaseDate: 'desc',
+      },
+      select: {
+        id: true,
+        title: true,
+        genre: true,
+        poster: true,
+        rating: true,
+        totalReviews: true,
+      },
+    });
+
+    return films;
+  }
+
+  async getFilmsByPage(page: number) {
+    const films = await this.prisma.films.findMany({
+      skip: (page - 1) * 10,
+      take: 10,
+      orderBy: {
+        releaseDate: 'desc',
+      },
+      select: {
+        id: true,
+        title: true,
+        genre: true,
+        poster: true,
+        rating: true,
+        totalReviews: true,
+      },
+    });
+
+    return films;
+  }
+
   async getFilm(id: string) {
     // Check if the film exists
     const film = await this.findById(id);

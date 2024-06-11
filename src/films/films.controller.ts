@@ -31,6 +31,24 @@ export class FilmsController {
     return this.filmsService.addFilm(dto);
   }
 
+  @Get('total')
+  @UseGuards(HeaderApiKeyGuard)
+  async getTotalFilms() {
+    return this.filmsService.getTotalFilms();
+  }
+
+  @Get('display/search/:search')
+  @UseGuards(HeaderApiKeyGuard)
+  async searchFilms(@Param('search') search: string) {
+    return this.filmsService.searchFilms(search);
+  }
+
+  @Get('display/page/:page')
+  @UseGuards(HeaderApiKeyGuard)
+  async getFilmsByPage(@Param('page') page: string) {
+    return this.filmsService.getFilmsByPage(Number(page));
+  }
+
   @Get('search/:id')
   @UseGuards(HeaderApiKeyGuard)
   async getFilm(@Param('id') id: string) {
