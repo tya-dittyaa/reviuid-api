@@ -8,7 +8,7 @@ import {
 } from 'src/common/guards';
 import { JwtPayloadData } from '../common/types';
 import { AuthService } from './auth.service';
-import { SigninDto, SignupDto } from './dto';
+import { SigninDto, SignupDto, VerifyOtpDto } from './dto';
 
 @ApiTags('Authentication Endpoints')
 @Controller('auth')
@@ -37,5 +37,17 @@ export class AuthController {
   @UseGuards(RefreshTokenGuard)
   async refresh(@User() user: JwtPayloadData) {
     return this.authService.refreshUserTokens(user.sub, user.refreshToken);
+  }
+
+  @Post('user/otp/send')
+  @UseGuards(HeaderApiKeyGuard)
+  async sendOtp(@Body() dto: { email: string }) {
+    return this.authService.sendOtp(dto.email);
+  }
+
+  @Post('user/otp/verify')
+  @UseGuards(HeaderApiKeyGuard)
+  async verifyOtp(@Body() dto: VerifyOtpDto) {
+    return this.authService.verifyOtp(dto);
   }
 }
