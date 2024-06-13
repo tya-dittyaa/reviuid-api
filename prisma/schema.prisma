@@ -105,6 +105,17 @@ model UserFilmReview {
   @@map("user_film_review")
 }
 
+model EmailVerification {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email String @unique
+  token String
+
+  @@map("email_verification")
+}
+
 enum UserRole {
   USER
   ADMIN
