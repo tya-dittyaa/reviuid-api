@@ -208,6 +208,10 @@ export class AuthService {
       throw new BadRequestException('Invalid OTP');
     }
 
+    if (otp.updatedAt.getTime() + 5 * 60 * 1000 < new Date().getTime()) {
+      throw new BadRequestException('OTP expired');
+    }
+
     // delete otp
     await this.prisma.emailVerification.delete({
       where: {
