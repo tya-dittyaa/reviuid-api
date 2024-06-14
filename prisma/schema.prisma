@@ -105,15 +105,22 @@ model UserFilmReview {
   @@map("user_film_review")
 }
 
-model EmailVerification {
+model OTPVerification {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  email String @unique
-  token String
+  email String  @unique
+  otp   String
+  type  OTPType
 
-  @@map("email_verification")
+  @@map("otp_verification")
+}
+
+enum OTPType {
+  REGISTER
+  FORGOT_PASSWORD
+  CHANGE_EMAIL
 }
 
 enum UserRole {

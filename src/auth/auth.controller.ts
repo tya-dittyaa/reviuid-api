@@ -8,7 +8,7 @@ import {
 } from 'src/common/guards';
 import { JwtPayloadData } from '../common/types';
 import { AuthService } from './auth.service';
-import { SigninDto, SignupDto, VerifyOtpDto } from './dto';
+import { CreateOtpDto, SigninDto, SignupDto, VerifyOtpDto } from './dto';
 
 @ApiTags('Authentication Endpoints')
 @Controller('auth')
@@ -33,6 +33,12 @@ export class AuthController {
     return this.authService.signOut(userId);
   }
 
+  @Post('user/forgot-password')
+  @UseGuards(HeaderApiKeyGuard)
+  async forgotPassword(@Body() dto: { email: string }) {
+    return this.authService.forgotPassword(dto.email);
+  }
+
   @Get('user/refresh')
   @UseGuards(RefreshTokenGuard)
   async refresh(@User() user: JwtPayloadData) {
@@ -41,8 +47,8 @@ export class AuthController {
 
   @Post('user/otp/send')
   @UseGuards(HeaderApiKeyGuard)
-  async sendOtp(@Body() dto: { email: string }) {
-    return this.authService.sendOtp(dto.email);
+  async sendOtp(@Body() dto: CreateOtpDto) {
+    return this.authService.sendOtp(dto);
   }
 
   @Post('user/otp/verify')
