@@ -1,4 +1,5 @@
-import { IsEmail, IsNotEmpty, IsNumberString } from 'class-validator';
+import { OTPType } from '@prisma/client';
+import { IsEmail, IsEnum, IsNotEmpty, IsNumberString } from 'class-validator';
 
 export class VerifyOtpDto {
   @IsNotEmpty()
@@ -8,4 +9,8 @@ export class VerifyOtpDto {
   @IsNotEmpty()
   @IsNumberString()
   otp: string;
+
+  @IsNotEmpty()
+  @IsEnum(OTPType)
+  type: OTPType;
 }
