@@ -124,49 +124,39 @@ export class UsersService {
     };
   }
 
-  async getFavoriteFilms(username: string) {
-    // Check if the user exists
+  async getFavoriteTotals(username: string) {
+    // Search for users by username
     const user = await this.findByUsername(username);
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    // Get the user's favorite films
-    const favoriteFilms = await this.prisma.userFilmFavorite.findMany({
+    // Get all favorites by user
+    const favorites = await this.prisma.userFilmFavorite.count({
       where: {
         user_id: user.id,
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      select: {
-        film: {
-          select: {
-            id: true,
-            title: true,
-            poster: true,
-          },
-        },
-      },
     });
 
-    return favoriteFilms.map((favorite) => favorite.film);
+    return favorites;
   }
 
-  async getWatchlistFilms(username: string) {
-    // Check if the user exists
+  async getFavoriteFilms(username: string, page: number) {
+    // Search for users by username
     const user = await this.findByUsername(username);
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    // Get the user's watchlist films
-    const watchlistFilms = await this.prisma.userFilmWatchlist.findMany({
+    // Get all favorites by user
+    const favorites = await this.prisma.userFilmFavorite.findMany({
       where: {
         user_id: user.id,
       },
+      skip: (page - 1) * 10,
+      take: 10,
       orderBy: {
         createdAt: 'desc',
       },
@@ -181,7 +171,57 @@ export class UsersService {
       },
     });
 
-    return watchlistFilms.map((watchlist) => watchlist.film);
+    return favorites.map((favorite) => favorite.film);
+  }
+
+  async getWatchlistTotals(username: string) {
+    // Search for users by username
+    const user = await this.findByUsername(username);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Get all watchlist by user
+    const watchlist = await this.prisma.userFilmWatchlist.count({
+      where: {
+        user_id: user.id,
+      },
+    });
+
+    return watchlist;
+  }
+
+  async getWatchlistFilms(username: string, page: number) {
+    // Search for users by username
+    const user = await this.findByUsername(username);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Get all watchlist by user
+    const watchlist = await this.prisma.userFilmWatchlist.findMany({
+      where: {
+        user_id: user.id,
+      },
+      skip: (page - 1) * 10,
+      take: 10,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        film: {
+          select: {
+            id: true,
+            title: true,
+            poster: true,
+          },
+        },
+      },
+    });
+
+    return watchlist.map((watch) => watch.film);
   }
 
   async checkUsername(username: string) {
