@@ -338,6 +338,29 @@ export class UsersService {
     await this.update(userId, { avatar: defaultAvatar });
   }
 
+  async checkFavoriteFilm(userId: string, filmId: string) {
+    // Check if the film ID is provided
+    if (!filmId) {
+      throw new BadRequestException('Film ID is required');
+    }
+
+    // Check if the film exists
+    const film = await this.filmsService.findById(filmId);
+    if (!film) {
+      throw new NotFoundException('Film not found');
+    }
+
+    // Check if the user added the film to favorites
+    const existingFavorite = await this.prisma.userFilmFavorite.findFirst({
+      where: {
+        user_id: userId,
+        film_id: filmId,
+      },
+    });
+
+    return existingFavorite ? true : false;
+  }
+
   async addFavoriteFilm(userId: string, filmId: string) {
     // Check if the film exists
     const film = await this.filmsService.findById(filmId);
@@ -395,6 +418,29 @@ export class UsersService {
 
     // Calculate the total favorites for the film
     await this.filmsService.calculateTotalFavorites(filmId);
+  }
+
+  async checkWatchlistFilm(userId: string, filmId: string) {
+    // Check if the film ID is provided
+    if (!filmId) {
+      throw new BadRequestException('Film ID is required');
+    }
+
+    // Check if the film exists
+    const film = await this.filmsService.findById(filmId);
+    if (!film) {
+      throw new NotFoundException('Film not found');
+    }
+
+    // Check if the user added the film to watchlist
+    const existingWatchlist = await this.prisma.userFilmWatchlist.findFirst({
+      where: {
+        user_id: userId,
+        film_id: filmId,
+      },
+    });
+
+    return existingWatchlist ? true : false;
   }
 
   async addWatchlistFilm(userId: string, filmId: string) {

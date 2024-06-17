@@ -80,6 +80,15 @@ export class UsersController {
     return this.usersService.deleteAvatar(userId);
   }
 
+  @Get('favorite/:filmId')
+  @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
+  async checkFavoriteFilm(
+    @User('sub') userId: string,
+    @Param('filmId') filmId: string,
+  ) {
+    return this.usersService.checkFavoriteFilm(userId, filmId);
+  }
+
   @Post('favorite/:filmId')
   @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
   async addFavoriteFilm(
@@ -96,6 +105,15 @@ export class UsersController {
     @Param('filmId') filmId: string,
   ) {
     return this.usersService.removeFavoriteFilm(userId, filmId);
+  }
+
+  @Get('watchlist/:filmId')
+  @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
+  async checkWatchlistFilm(
+    @User('sub') userId: string,
+    @Param('filmId') filmId: string,
+  ) {
+    return this.usersService.checkWatchlistFilm(userId, filmId);
   }
 
   @Post('watchlist/:filmId')
