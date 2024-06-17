@@ -362,6 +362,11 @@ export class UsersService {
   }
 
   async addFavoriteFilm(userId: string, filmId: string) {
+    // Check if the film ID is provided
+    if (!filmId) {
+      throw new BadRequestException('Film ID is required');
+    }
+
     // Check if the film exists
     const film = await this.filmsService.findById(filmId);
     if (!film) {
@@ -392,6 +397,11 @@ export class UsersService {
   }
 
   async removeFavoriteFilm(userId: string, filmId: string) {
+    // Check if the film ID is provided
+    if (!filmId) {
+      throw new BadRequestException('Film ID is required');
+    }
+
     // Check if the film exists
     const film = await this.filmsService.findById(filmId);
     if (!film) {
@@ -444,6 +454,11 @@ export class UsersService {
   }
 
   async addWatchlistFilm(userId: string, filmId: string) {
+    // Check if the film ID is provided
+    if (!filmId) {
+      throw new BadRequestException('Film ID is required');
+    }
+
     // Check if the film exists
     const film = await this.filmsService.findById(filmId);
     if (!film) {
@@ -471,6 +486,11 @@ export class UsersService {
   }
 
   async removeWatchlistFilm(userId: string, filmId: string) {
+    // Check if the film ID is provided
+    if (!filmId) {
+      throw new BadRequestException('Film ID is required');
+    }
+
     // Check if the film exists
     const film = await this.filmsService.findById(filmId);
     if (!film) {
@@ -497,6 +517,11 @@ export class UsersService {
   }
 
   async getFilmReview(userId: string, filmId: string) {
+    // Check if the film ID is provided
+    if (!filmId) {
+      throw new BadRequestException('Film ID is required');
+    }
+
     // Check if the film exists
     const film = await this.filmsService.findById(filmId);
     if (!film) {
@@ -515,6 +540,11 @@ export class UsersService {
   }
 
   async addFilmReview(userId: string, filmId: string, dto: AddFilmReviewDto) {
+    // Check if the film ID is provided
+    if (!filmId) {
+      throw new BadRequestException('Film ID is required');
+    }
+
     // Check if the film exists
     const film = await this.filmsService.findById(filmId);
     if (!film) {
@@ -561,6 +591,11 @@ export class UsersService {
     filmId: string,
     dto: AddFilmReviewDto,
   ) {
+    // Check if the film ID is provided
+    if (!filmId) {
+      throw new BadRequestException('Film ID is required');
+    }
+
     // Check if the film exists
     const film = await this.filmsService.findById(filmId);
     if (!film) {
@@ -604,6 +639,11 @@ export class UsersService {
   }
 
   async removeFilmReview(userId: string, filmId: string) {
+    // Check if the film ID is provided
+    if (!filmId) {
+      throw new BadRequestException('Film ID is required');
+    }
+
     // Check if the film exists
     const film = await this.filmsService.findById(filmId);
     if (!film) {
