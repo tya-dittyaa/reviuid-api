@@ -22,22 +22,40 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get('display/profile/:username')
+  @Get('display/:username/profile')
   @UseGuards(HeaderApiKeyGuard)
   async getProfile(@Param('username') username: string) {
     return this.usersService.getProfile(username);
   }
 
-  @Get('display/favorite/:username')
+  @Get('display/:username/favorite/totals')
   @UseGuards(HeaderApiKeyGuard)
-  async getFavoriteFilms(@Param('username') username: string) {
-    return this.usersService.getFavoriteFilms(username);
+  async getFavoriteTotals(@Param('username') username: string) {
+    return this.usersService.getFavoriteTotals(username);
   }
 
-  @Get('display/watchlist/:username')
+  @Get('display/:username/favorite/:page')
   @UseGuards(HeaderApiKeyGuard)
-  async getWatchlistFilms(@Param('username') username: string) {
-    return this.usersService.getWatchlistFilms(username);
+  async getFavoriteFilms(
+    @Param('username') username: string,
+    @Param('page') page: number,
+  ) {
+    return this.usersService.getFavoriteFilms(username, page);
+  }
+
+  @Get('display/:username/watchlist/totals')
+  @UseGuards(HeaderApiKeyGuard)
+  async getWatchlistTotals(@Param('username') username: string) {
+    return this.usersService.getWatchlistTotals(username);
+  }
+
+  @Get('display/:username/watchlist/:page')
+  @UseGuards(HeaderApiKeyGuard)
+  async getWatchlistFilms(
+    @Param('username') username: string,
+    @Param('page') page: number,
+  ) {
+    return this.usersService.getWatchlistFilms(username, page);
   }
 
   @Post('check/username')
