@@ -170,6 +170,7 @@ export class FilmsService {
         id: true,
         rating: true,
         review: true,
+        updatedAt: true,
         user: {
           select: {
             id: true,
