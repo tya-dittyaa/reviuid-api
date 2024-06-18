@@ -358,7 +358,7 @@ export class UsersService {
     });
 
     // Update avatar on database
-    const avatarUrl = `https://drive.google.com/uc?export=view&id=${response.data.id}`;
+    const avatarUrl = `https://lh3.googleusercontent.com/d/${response.data.id}`;
     await this.update(userId, { avatar: avatarUrl });
   }
 
@@ -384,7 +384,7 @@ export class UsersService {
 
     // Delete the avatar
     const defaultAvatar =
-      'https://drive.google.com/uc?export=view&id=1yhM-tDrQwh166RGAqTGzLKPvVri7jAKD';
+      'https://lh3.googleusercontent.com/d/1yhM-tDrQwh166RGAqTGzLKPvVri7jAKD';
     await this.update(userId, { avatar: defaultAvatar });
   }
 
