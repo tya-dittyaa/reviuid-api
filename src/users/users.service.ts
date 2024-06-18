@@ -142,7 +142,30 @@ export class UsersService {
     return favorites;
   }
 
+  async getWatchlistTotals(username: string) {
+    // Search for users by username
+    const user = await this.findByUsername(username);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Get all watchlist by user
+    const watchlist = await this.prisma.userFilmWatchlist.count({
+      where: {
+        user_id: user.id,
+      },
+    });
+
+    return watchlist;
+  }
+
   async getFavoriteFilms(username: string, page: number) {
+    //
+    if (isNaN(page)) {
+      throw new BadRequestException('Invalid page number');
+    }
+
     // Search for users by username
     const user = await this.findByUsername(username);
 
@@ -174,25 +197,12 @@ export class UsersService {
     return favorites.map((favorite) => favorite.film);
   }
 
-  async getWatchlistTotals(username: string) {
-    // Search for users by username
-    const user = await this.findByUsername(username);
-
-    if (!user) {
-      throw new NotFoundException('User not found');
+  async getWatchlistFilms(username: string, page: number) {
+    //
+    if (isNaN(page)) {
+      throw new BadRequestException('Invalid page number');
     }
 
-    // Get all watchlist by user
-    const watchlist = await this.prisma.userFilmWatchlist.count({
-      where: {
-        user_id: user.id,
-      },
-    });
-
-    return watchlist;
-  }
-
-  async getWatchlistFilms(username: string, page: number) {
     // Search for users by username
     const user = await this.findByUsername(username);
 
