@@ -28,13 +28,19 @@ export class UsersController {
     return this.usersService.getProfile(username);
   }
 
-  @Get('display/:username/favorite/totals')
+  @Get('display/:username/favorite/total')
   @UseGuards(HeaderApiKeyGuard)
   async getFavoriteTotals(@Param('username') username: string) {
     return this.usersService.getFavoriteTotals(username);
   }
 
-  @Get('display/:username/favorite/:page')
+  @Get('display/:username/watchlist/total')
+  @UseGuards(HeaderApiKeyGuard)
+  async getWatchlistTotals(@Param('username') username: string) {
+    return this.usersService.getWatchlistTotals(username);
+  }
+
+  @Get('display/:username/favorite/page/:page')
   @UseGuards(HeaderApiKeyGuard)
   async getFavoriteFilms(
     @Param('username') username: string,
@@ -43,13 +49,7 @@ export class UsersController {
     return this.usersService.getFavoriteFilms(username, page);
   }
 
-  @Get('display/:username/watchlist/totals')
-  @UseGuards(HeaderApiKeyGuard)
-  async getWatchlistTotals(@Param('username') username: string) {
-    return this.usersService.getWatchlistTotals(username);
-  }
-
-  @Get('display/:username/watchlist/:page')
+  @Get('display/:username/watchlist/page/:page')
   @UseGuards(HeaderApiKeyGuard)
   async getWatchlistFilms(
     @Param('username') username: string,
