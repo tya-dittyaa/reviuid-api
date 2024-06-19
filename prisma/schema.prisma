@@ -14,15 +14,15 @@ datasource db {
 }
 
 model Users {
-  id   String @id @default(cuid())
-  role String @default("USER")
+  id   String   @id @default(cuid())
+  role UserRole @default(USER)
 
   email        String  @unique
   password     String
   refreshToken String?
 
   username  String  @unique
-  avatar    String  @default("https://drive.google.com/uc?export=view&id=1yhM-tDrQwh166RGAqTGzLKPvVri7jAKD")
+  avatar    String  @default("https://lh3.googleusercontent.com/d/1yhM-tDrQwh166RGAqTGzLKPvVri7jAKD")
   biography String?
 
   createdAt DateTime @default(now())
@@ -31,6 +31,8 @@ model Users {
   UserFilmFavorite  UserFilmFavorite[]
   UserFilmWatchlist UserFilmWatchlist[]
   UserFilmReview    UserFilmReview[]
+  ForumParent       ForumParent[]
+  ForumChild        ForumChild[]
 
   @@map("users")
 }
@@ -93,14 +95,14 @@ model UserFilmReview {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  rating Int
+  review String
+
   user_id String
   film_id String
 
   user Users @relation(fields: [user_id], references: [id])
   film Films @relation(fields: [film_id], references: [id])
-
-  rating Int
-  review String
 
   @@map("user_film_review")
 }
@@ -115,6 +117,38 @@ model OTPVerification {
   type  OTPType
 
   @@map("otp_verification")
+}
+
+model ForumParent {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title   String
+  content String
+
+  user_id String
+  user    Users  @relation(fields: [user_id], references: [id])
+
+  ForumChild ForumChild[]
+
+  @@map("forum_parent")
+}
+
+model ForumChild {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  content String
+
+  user_id String
+  user    Users  @relation(fields: [user_id], references: [id])
+
+  forum_parent_id String
+  forum_parent    ForumParent @relation(fields: [forum_parent_id], references: [id])
+
+  @@map("forum_child")
 }
 
 enum OTPType {
