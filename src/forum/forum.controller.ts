@@ -16,9 +16,9 @@ export class ForumController {
     return this.forumService.totalParent();
   }
 
-  @Get('child/total')
+  @Get('child/total/:parentId')
   @UseGuards(HeaderApiKeyGuard)
-  async totalChildren(@Body('parentId') parentId: string) {
+  async totalChildren(@Param('parentId') parentId: string) {
     return this.forumService.totalChildren(parentId);
   }
 
@@ -56,5 +56,14 @@ export class ForumController {
   @UseGuards(HeaderApiKeyGuard)
   async displayForumParentBySearch(@Param('search') search: string) {
     return this.forumService.displayForumParentBySearch(search);
+  }
+
+  @Get('child/display/parent/:parentId/page/:page')
+  @UseGuards(HeaderApiKeyGuard)
+  async displayForumChildByParentId(
+    @Param('parentId') parentId: string,
+    @Param('page') page: number,
+  ) {
+    return this.forumService.displayForumChildByParentId(parentId, page);
   }
 }
