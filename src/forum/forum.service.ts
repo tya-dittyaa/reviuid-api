@@ -92,6 +92,38 @@ export class ForumService {
     });
   }
 
+  async displayForumParentById(parentId: string) {
+    // Check if parent ID is provided
+    if (!parentId) {
+      throw new NotFoundException('Parent ID is required');
+    }
+
+    // Check if parent exists
+    const parent = await this.prismaService.forumParent.findUnique({
+      where: {
+        id: parentId,
+      },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        createdAt: true,
+        updatedAt: true,
+        user: {
+          select: {
+            username: true,
+            avatar: true,
+          },
+        },
+      },
+    });
+    if (!parent) {
+      throw new NotFoundException('Parent not found');
+    }
+
+    return parent;
+  }
+
   async displayForumParentByPage(page: number) {
     if (!page) {
       throw new BadRequestException('Page number is required');
@@ -116,6 +148,7 @@ export class ForumService {
         title: true,
         content: true,
         createdAt: true,
+        updatedAt: true,
         user: {
           select: {
             username: true,
@@ -148,6 +181,7 @@ export class ForumService {
         title: true,
         content: true,
         createdAt: true,
+        updatedAt: true,
         user: {
           select: {
             username: true,

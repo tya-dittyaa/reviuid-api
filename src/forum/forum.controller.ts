@@ -40,6 +40,12 @@ export class ForumController {
     return this.forumService.createChild(userId, dto);
   }
 
+  @Get('parent/display/id/:id')
+  @UseGuards(HeaderApiKeyGuard)
+  async displayForumParentInfo(@Param('id') id: string) {
+    return this.forumService.displayForumParentById(id);
+  }
+
   @Get('parent/display/page/:page')
   @UseGuards(HeaderApiKeyGuard)
   async displayForumParent(@Param('page') page: number) {
