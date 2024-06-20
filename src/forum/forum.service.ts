@@ -194,4 +194,61 @@ export class ForumService {
 
     return parents;
   }
+
+  async displayForumChildByParentId(parentId: string, page: number) {
+    // Check if parent ID is provided
+    if (!parentId) {
+      throw new NotFoundException('Parent ID is required');
+    }
+
+    // Check if parent exists
+    const parent = await this.prismaService.forumParent.findUnique({
+      where: {
+        id: parentId,
+      },
+    });
+    if (!parent) {
+      throw new NotFoundException('Parent not found');
+    }
+
+    // Check if page is provided
+    if (!page) {
+      throw new BadRequestException('Page number is required');
+    }
+
+    // Check if page is invalid
+    if (isNaN(page)) {
+      throw new BadRequestException('Invalid page number');
+    }
+
+    // Check if page is less than 1
+    if (page < 1) {
+      throw new BadRequestException('Page number must be greater than 0');
+    }
+
+    // Get children
+    const children = await this.prismaService.forumChild.findMany({
+      where: {
+        forum_parent_id: parentId,
+      },
+      skip: (page - 1) * 10,
+      take: 10,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        user: {
+          select: {
+            username: true,
+            avatar: true,
+          },
+        },
+      },
+    });
+
+    return children;
+  }
 }
