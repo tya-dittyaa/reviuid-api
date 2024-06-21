@@ -4,6 +4,7 @@ import { AuthModule } from './auth/auth.module';
 import { FilmsModule } from './films/films.module';
 import { ForumModule } from './forum/forum.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { SecurityModule } from './security/security.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -14,7 +15,9 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     FilmsModule,
     ForumModule,
+    SecurityModule,
   ],
   providers: [],
+  controllers: [],
 })
 export class AppModule {}
