@@ -111,6 +111,7 @@ export class ForumService {
         updatedAt: true,
         user: {
           select: {
+            id: true,
             username: true,
             avatar: true,
           },
@@ -141,7 +142,7 @@ export class ForumService {
       skip: (page - 1) * 10,
       take: 10,
       orderBy: {
-        updatedAt: 'desc',
+        createdAt: 'desc',
       },
       select: {
         id: true,
@@ -151,6 +152,7 @@ export class ForumService {
         updatedAt: true,
         user: {
           select: {
+            id: true,
             username: true,
             avatar: true,
           },
@@ -184,6 +186,7 @@ export class ForumService {
         updatedAt: true,
         user: {
           select: {
+            id: true,
             username: true,
             avatar: true,
           },
@@ -193,6 +196,37 @@ export class ForumService {
     });
 
     return parents;
+  }
+
+  async displayForumChildById(childId: string) {
+    // Check if child ID is provided
+    if (!childId) {
+      throw new NotFoundException('Child ID is required');
+    }
+
+    // Check if child exists
+    const child = await this.prismaService.forumChild.findUnique({
+      where: {
+        id: childId,
+      },
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        user: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+      },
+    });
+    if (!child) {
+      throw new NotFoundException('Child not found');
+    }
+
+    return child;
   }
 
   async displayForumChildByParentId(parentId: string, page: number) {
@@ -242,6 +276,7 @@ export class ForumService {
         createdAt: true,
         user: {
           select: {
+            id: true,
             username: true,
             avatar: true,
           },
@@ -250,5 +285,183 @@ export class ForumService {
     });
 
     return children;
+  }
+
+  async updateForumParent(
+    userId: string,
+    parentId: string,
+    dto: CreateForumParentDto,
+  ) {
+    // Check if user exists
+    const user = await this.usersService.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Check if parent ID is provided
+    if (!parentId) {
+      throw new NotFoundException('Parent ID is required');
+    }
+
+    // Check if parent exists
+    const parent = await this.prismaService.forumParent.findUnique({
+      where: {
+        id: parentId,
+      },
+    });
+    if (!parent) {
+      throw new NotFoundException('Parent not found');
+    }
+
+    // Check if user is the owner
+    if (parent.user_id !== userId) {
+      throw new BadRequestException('You are not the owner of this parent');
+    }
+
+    // Update parent
+    await this.prismaService.forumParent.update({
+      where: {
+        id: parentId,
+      },
+      data: {
+        title: dto.title,
+        content: dto.content,
+      },
+    });
+
+    // Return success message
+    return {
+      message: 'Forum parent updated successfully',
+    };
+  }
+
+  async deleteForumParent(userId: string, parentId: string) {
+    // Check if user exists
+    const user = await this.usersService.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Check if parent ID is provided
+    if (!parentId) {
+      throw new NotFoundException('Parent ID is required');
+    }
+
+    // Check if parent exists
+    const parent = await this.prismaService.forumParent.findUnique({
+      where: {
+        id: parentId,
+      },
+    });
+    if (!parent) {
+      throw new NotFoundException('Parent not found');
+    }
+
+    // Check if user is the owner
+    if (parent.user_id !== userId) {
+      throw new BadRequestException('You are not the owner of this parent');
+    }
+
+    // Delete children
+    await this.prismaService.forumChild.deleteMany({
+      where: {
+        forum_parent_id: parentId,
+      },
+    });
+
+    // Delete parent
+    await this.prismaService.forumParent.delete({
+      where: {
+        id: parentId,
+      },
+    });
+
+    // Return success message
+    return {
+      message: 'Forum parent deleted successfully',
+    };
+  }
+
+  async updateForumChild(userId: string, childId: string, content: string) {
+    // Check if user exists
+    const user = await this.usersService.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Check if child ID is provided
+    if (!childId) {
+      throw new NotFoundException('Child ID is required');
+    }
+
+    // Check if child exists
+    const child = await this.prismaService.forumChild.findUnique({
+      where: {
+        id: childId,
+      },
+    });
+    if (!child) {
+      throw new NotFoundException('Child not found');
+    }
+
+    // Check if user is the owner
+    if (child.user_id !== userId) {
+      throw new BadRequestException('You are not the owner of this child');
+    }
+
+    // Update child
+    await this.prismaService.forumChild.update({
+      where: {
+        id: childId,
+      },
+      data: {
+        content,
+      },
+    });
+
+    // Return success message
+    return {
+      message: 'Forum child updated successfully',
+    };
+  }
+
+  async deleteForumChild(userId: string, childId: string) {
+    // Check if user exists
+    const user = await this.usersService.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Check if child ID is provided
+    if (!childId) {
+      throw new NotFoundException('Child ID is required');
+    }
+
+    // Check if child exists
+    const child = await this.prismaService.forumChild.findUnique({
+      where: {
+        id: childId,
+      },
+    });
+    if (!child) {
+      throw new NotFoundException('Child not found');
+    }
+
+    // Check if user is the owner
+    if (child.user_id !== userId) {
+      throw new BadRequestException('You are not the owner of this child');
+    }
+
+    // Delete child
+    await this.prismaService.forumChild.delete({
+      where: {
+        id: childId,
+      },
+    });
+
+    // Return success message
+    return {
+      message: 'Forum child deleted successfully',
+    };
   }
 }

@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from 'src/common/decorators';
 import { AccessTokenGuard, HeaderApiKeyGuard } from 'src/common/guards';
@@ -58,6 +67,12 @@ export class ForumController {
     return this.forumService.displayForumParentBySearch(search);
   }
 
+  @Get('child/display/id/:id')
+  @UseGuards(HeaderApiKeyGuard)
+  async displayForumChildInfo(@Param('id') id: string) {
+    return this.forumService.displayForumChildById(id);
+  }
+
   @Get('child/display/parent/:parentId/page/:page')
   @UseGuards(HeaderApiKeyGuard)
   async displayForumChildByParentId(
@@ -65,5 +80,40 @@ export class ForumController {
     @Param('page') page: number,
   ) {
     return this.forumService.displayForumChildByParentId(parentId, page);
+  }
+
+  @Patch('parent/update/:id')
+  @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
+  async updateForumParent(
+    @User('sub') userId: string,
+    @Param('id') id: string,
+    @Body() dto: CreateForumParentDto,
+  ) {
+    return this.forumService.updateForumParent(userId, id, dto);
+  }
+
+  @Delete('parent/delete/:id')
+  @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
+  async deleteForumParent(
+    @User('sub') userId: string,
+    @Param('id') id: string,
+  ) {
+    return this.forumService.deleteForumParent(userId, id);
+  }
+
+  @Patch('child/update/:id')
+  @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
+  async updateForumChild(
+    @User('sub') userId: string,
+    @Param('id') id: string,
+    @Body('content') content: string,
+  ) {
+    return this.forumService.updateForumChild(userId, id, content);
+  }
+
+  @Delete('child/delete/:id')
+  @UseGuards(HeaderApiKeyGuard, AccessTokenGuard)
+  async deleteForumChild(@User('sub') userId: string, @Param('id') id: string) {
+    return this.forumService.deleteForumChild(userId, id);
   }
 }

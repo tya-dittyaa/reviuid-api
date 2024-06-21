@@ -101,6 +101,20 @@ export class UsersService {
       }
     }
 
+    // Remove all forum children by user
+    await this.prisma.forumChild.findMany({
+      where: {
+        user_id: userId,
+      },
+    });
+
+    // Remove all forum parents by user
+    await this.prisma.forumParent.findMany({
+      where: {
+        user_id: userId,
+      },
+    });
+
     // Delete the user
     return this.prisma.users.delete({
       where: {
