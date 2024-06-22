@@ -59,8 +59,6 @@ export class UsersService {
   }
 
   async delete(userId: string) {
-    console.log(userId);
-
     try {
       // Get all favorites by user
       const favorite = await this.prisma.userFilmFavorite.findMany({
