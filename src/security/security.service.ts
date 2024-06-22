@@ -168,7 +168,7 @@ export class SecurityService {
       case 'USER_FILM_COMMENT':
         const review = await this.prisma.userFilmReview.findMany({
           where: {
-            user_id: check.reportId,
+            id: check.reportId,
           },
         });
 
