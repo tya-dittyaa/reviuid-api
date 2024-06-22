@@ -153,7 +153,7 @@ export class SecurityService {
             id: check.reportId,
           },
           data: {
-            biography: '',
+            biography: null,
           },
         });
         break;

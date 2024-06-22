@@ -80,32 +80,33 @@ export class AuthService {
         to: dto.email,
         subject: 'Selamat Datang di Reviu.ID',
         html: `
-        Halo, <b>${dto.username}</b>!
-        </br>
-        Terima kasih telah bergabung dengan aplikasi Reviu.ID
-        </br>
-        </br>
-        Akun Anda telah berhasil dibuat.
-        </br>
-        Berikut adalah informasi akun Anda:
-        </br>
-        - Email: <b>${dto.email}</b>
-        </br>
-        - Username: <b>${dto.username}</b>
-        </br>
-        </br>
-        Catatan:
-        </br>
-        - Jangan memberitahukan kata sandi Anda kepada siapapun.
-        </br>
-        - Anda dapat mengubah kata sandi Anda di menu pengaturan.
-        </br>
-        - Jika Anda memiliki pertanyaan, jangan ragu untuk menghubungi kami.
-        </br>
-        </br>
-        Salam,
-        </br>
-        Tim Reviu.ID
+        <html>
+          <body>
+            <h1>Halo, <b>${dto.username}</b>!</h1>
+            <p>Terima kasih telah bergabung dengan aplikasi Reviu.ID</p>
+            <br>
+            <br>
+            <p>Akun Anda telah berhasil dibuat.</p>
+            <br>
+            <p>Berikut adalah informasi akun Anda:</p>
+            <ul>
+              <li>Email: <b>${dto.email}</b></li>
+              <li>Username: <b>${dto.username}</b></li>
+            </ul>
+            <br>
+            <br>
+            <h3>Catatan:</h3>
+            <ul>
+              <li>Jangan memberitahukan kata sandi Anda kepada siapapun.</li>
+              <li>Anda dapat mengubah kata sandi Anda di menu pengaturan.</li>
+              <li>Jika Anda memiliki pertanyaan, jangan ragu untuk menghubungi kami.</li>
+            </ul>
+            <br>
+            <br>
+            <p>Salam,</p>
+            <p>Tim Reviu.ID</p>
+          </body>
+        </html>
         `,
       });
     } catch (error) {
@@ -142,26 +143,27 @@ export class AuthService {
         to: dto.email,
         subject: 'Peringatan Keamanan - Reviu.ID',
         html: `
-        Halo, <b>${user.username}</b>!
-        </br>
-        Kami mendeteksi bahwa ada yang berhasil masuk ke dalam akun Reviu.ID Anda.
-        </br>
-        </br>
-        Jika Anda tidak melakukan login ini, segera ubah kata sandi Anda dan hubungi kami.
-        </br>
-        </br>
-        Catatan:
-        </br>
-        - Jangan memberitahukan kata sandi Anda kepada siapapun.
-        </br>
-        - Anda dapat mengubah kata sandi Anda di menu pengaturan.
-        </br>
-        - Jika Anda memiliki pertanyaan, jangan ragu untuk menghubungi kami.
-        </br>
-        </br>
-        Salam,
-        </br>
-        Tim Reviu.ID
+        <html>
+          <body>
+            <h1>Halo, <b>${user.username}</b>!</h1>
+            <p>Kami mendeteksi bahwa ada yang berhasil masuk ke dalam akun Reviu.ID Anda.</p>
+            <br>
+            <br>
+            <p>Jika Anda tidak melakukan login ini, segera ubah kata sandi Anda dan hubungi kami.</p>
+            <br>
+            <br>
+            <h3>Catatan:</h3>
+            <ul>
+              <li>Jangan memberitahukan kata sandi Anda kepada siapapun.</li>
+              <li>Anda dapat mengubah kata sandi Anda di menu pengaturan.</li>
+              <li>Jika Anda memiliki pertanyaan, jangan ragu untuk menghubungi kami.</li>
+            </ul>
+            <br>
+            <br>
+            <p>Salam,</p>
+            <p>Tim Reviu.ID</p>
+          </body>
+        </html>
         `,
       });
     } catch (error) {
@@ -209,28 +211,24 @@ export class AuthService {
         to: email,
         subject: 'Mengatur Ulang Kata Sandi',
         html: `
-        Halo, <b>${user.username}</b>!
-        </br>
-        Terima kasih telah menggunakan aplikasi Reviu.ID
-        </br>
-        </br>
-        Kami telah menerima permintaan Anda untuk mengatur ulang kata sandi.
-        </br>
-        Berikut adalah kata sandi baru Anda: <b>${newPassword}</b>
-        </br>
-        </br>
-        Catatan:
-        </br>
-        - Jangan memberitahukan kata sandi ini kepada siapapun.
-        </br>
-        - Anda dapat mengubah kata sandi Anda di menu pengaturan.
-        </br>
-        - Jika Anda tidak merasa melakukan permintaan ini, segera hubungi kami.
-        </br>
-        </br>
-        Salam,
-        </br>
-        Tim Reviu.ID
+        <html>
+          <body>
+            <h1>Halo, <b>${user.username}</b>!</h1>
+            <p>Terima kasih telah menggunakan aplikasi Reviu.ID</p>
+            <p>Kami telah menerima permintaan Anda untuk mengatur ulang kata sandi.</p>
+            <p>Berikut adalah kata sandi baru Anda: <b>${newPassword}</b></p>
+            <br>
+            <p>Catatan:</p>
+            <ul>
+              <li>Jangan memberitahukan kata sandi ini kepada siapapun.</li>
+              <li>Anda dapat mengubah kata sandi Anda di menu pengaturan.</li>
+              <li>Jika Anda tidak merasa melakukan permintaan ini, segera hubungi kami.</li>
+            </ul>
+            <br>
+            <p>Salam,</p>
+            <p>Tim Reviu.ID</p>
+          </body>
+        </html>
         `,
       });
 
@@ -329,26 +327,27 @@ export class AuthService {
         to: dto.email,
         subject,
         html: `
-        Halo, ${user ? `<b>${user.username}</b>` : 'Pengguna'}!
-        </br>
-        Terima kasih telah menggunakan aplikasi Reviu.ID
-        </br>
-        </br>
-        Berikut adalah kode OTP Anda: <b>${otpCode}</b>
-        </br>
-        </br>
-        Catatan:
-        </br>
-        - Jangan memberitahukan kode ini kepada siapapun.
-        </br>
-        - Kode ini akan kadaluarsa dalam waktu 5 menit.
-        </br>
-        - Jika Anda tidak merasa melakukan permintaan ini, segera hubungi kami.
-        </br>
-        </br>
-        Salam,
-        </br>
-        Tim Reviu.ID
+        <html>
+          <body>
+            <p>Halo, ${user ? `<b>${user.username}</b>` : 'Pengguna'}!</p>
+            <p>Terima kasih telah menggunakan aplikasi Reviu.ID</p>
+            <br>
+            <br>
+            <p>Berikut adalah kode OTP Anda: <b>${otpCode}</b></p>
+            <br>
+            <br>
+            <p>Catatan:</p>
+            <ul>
+              <li>Jangan memberitahukan kode ini kepada siapapun.</li>
+              <li>Kode ini akan kadaluarsa dalam waktu 5 menit.</li>
+              <li>Jika Anda tidak merasa melakukan permintaan ini, segera hubungi kami.</li>
+            </ul>
+            <br>
+            <br>
+            <p>Salam,</p>
+            <p>Tim Reviu.ID</p>
+          </body>
+        </html>
         `,
       });
     } catch (error) {

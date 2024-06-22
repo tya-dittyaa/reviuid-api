@@ -59,68 +59,83 @@ export class UsersService {
   }
 
   async delete(userId: string) {
-    // Get all favorites by user
-    const favorite = await this.prisma.userFilmFavorite.findMany({
-      where: {
-        user_id: userId,
-      },
-    });
+    console.log(userId);
 
-    // Remove all favorites
-    if (favorite.length > 0) {
-      for (const f of favorite) {
-        await this.removeFavoriteFilm(userId, f.film_id);
+    try {
+      // Get all favorites by user
+      const favorite = await this.prisma.userFilmFavorite.findMany({
+        where: {
+          user_id: userId,
+        },
+      });
+
+      // Remove all favorites
+      if (favorite.length > 0) {
+        for (const f of favorite) {
+          await this.removeFavoriteFilm(userId, f.film_id);
+        }
       }
-    }
 
-    // Get all watchlist by user
-    const watchlist = await this.prisma.userFilmWatchlist.findMany({
-      where: {
-        user_id: userId,
-      },
-    });
+      // Get all watchlist by user
+      const watchlist = await this.prisma.userFilmWatchlist.findMany({
+        where: {
+          user_id: userId,
+        },
+      });
 
-    // Remove all watchlist
-    if (watchlist.length > 0) {
-      for (const w of watchlist) {
-        await this.removeWatchlistFilm(userId, w.film_id);
+      // Remove all watchlist
+      if (watchlist.length > 0) {
+        for (const w of watchlist) {
+          await this.removeWatchlistFilm(userId, w.film_id);
+        }
       }
-    }
 
-    // Get all reviews by user
-    const review = await this.prisma.userFilmReview.findMany({
-      where: {
-        user_id: userId,
-      },
-    });
+      // Get all reviews by user
+      const review = await this.prisma.userFilmReview.findMany({
+        where: {
+          user_id: userId,
+        },
+      });
 
-    // Remove all reviews
-    if (review.length > 0) {
-      for (const r of review) {
-        await this.removeFilmReview(userId, r.film_id);
+      // Remove all reviews
+      if (review.length > 0) {
+        for (const r of review) {
+          await this.removeFilmReview(userId, r.film_id);
+        }
       }
+
+      // Remove all forum children by user
+      await this.prisma.forumChild.deleteMany({
+        where: {
+          user_id: userId,
+        },
+      });
+
+      // Remove all forum parents by user
+      await this.prisma.forumParent.deleteMany({
+        where: {
+          user_id: userId,
+        },
+      });
+
+      // Remove all report to user
+      await this.prisma.userReport.deleteMany({
+        where: {
+          user_id: userId,
+        },
+      });
+
+      // Delete the user
+      await this.prisma.users.delete({
+        where: {
+          id: userId,
+        },
+      });
+
+      return true;
+    } catch (error) {
+      throw new BadRequestException('Failed to delete user');
     }
-
-    // Remove all forum children by user
-    await this.prisma.forumChild.findMany({
-      where: {
-        user_id: userId,
-      },
-    });
-
-    // Remove all forum parents by user
-    await this.prisma.forumParent.findMany({
-      where: {
-        user_id: userId,
-      },
-    });
-
-    // Delete the user
-    return this.prisma.users.delete({
-      where: {
-        id: userId,
-      },
-    });
   }
 
   async getProfile(username: string) {
