@@ -82,10 +82,8 @@ export class AuthService {
         html: `
         <html>
           <body>
-            <h1>Halo, <b>${dto.username}</b>!</h1>
+            <h3>Halo, <b>${dto.username}</b>!</h3>
             <p>Terima kasih telah bergabung dengan aplikasi Reviu.ID</p>
-            <br>
-            <br>
             <p>Akun Anda telah berhasil dibuat.</p>
             <br>
             <p>Berikut adalah informasi akun Anda:</p>
@@ -94,7 +92,6 @@ export class AuthService {
               <li>Username: <b>${dto.username}</b></li>
             </ul>
             <br>
-            <br>
             <h3>Catatan:</h3>
             <ul>
               <li>Jangan memberitahukan kata sandi Anda kepada siapapun.</li>
@@ -102,9 +99,8 @@ export class AuthService {
               <li>Jika Anda memiliki pertanyaan, jangan ragu untuk menghubungi kami.</li>
             </ul>
             <br>
-            <br>
-            <p>Salam,</p>
-            <p>Tim Reviu.ID</p>
+            <p><i>Salam,</i></p>
+            <p><b><i>Tim Reviu.ID</i></b></p>
           </body>
         </html>
         `,
@@ -145,12 +141,9 @@ export class AuthService {
         html: `
         <html>
           <body>
-            <h1>Halo, <b>${user.username}</b>!</h1>
+            <h3>Halo, <b>${user.username}</b>!</h3>
             <p>Kami mendeteksi bahwa ada yang berhasil masuk ke dalam akun Reviu.ID Anda.</p>
-            <br>
-            <br>
             <p>Jika Anda tidak melakukan login ini, segera ubah kata sandi Anda dan hubungi kami.</p>
-            <br>
             <br>
             <h3>Catatan:</h3>
             <ul>
@@ -159,9 +152,8 @@ export class AuthService {
               <li>Jika Anda memiliki pertanyaan, jangan ragu untuk menghubungi kami.</li>
             </ul>
             <br>
-            <br>
-            <p>Salam,</p>
-            <p>Tim Reviu.ID</p>
+            <p><i>Salam,</i></p>
+            <p><b><i>Tim Reviu.ID</i></b></p>
           </body>
         </html>
         `,
@@ -213,9 +205,10 @@ export class AuthService {
         html: `
         <html>
           <body>
-            <h1>Halo, <b>${user.username}</b>!</h1>
+            <h3>Halo, <b>${user.username}</b>!</h3>
             <p>Terima kasih telah menggunakan aplikasi Reviu.ID</p>
             <p>Kami telah menerima permintaan Anda untuk mengatur ulang kata sandi.</p>
+            <br>
             <p>Berikut adalah kata sandi baru Anda: <b>${newPassword}</b></p>
             <br>
             <p>Catatan:</p>
@@ -225,8 +218,8 @@ export class AuthService {
               <li>Jika Anda tidak merasa melakukan permintaan ini, segera hubungi kami.</li>
             </ul>
             <br>
-            <p>Salam,</p>
-            <p>Tim Reviu.ID</p>
+            <p><i>Salam,</i></p>
+            <p><b><i>Tim Reviu.ID</i></b></p>
           </body>
         </html>
         `,
@@ -329,12 +322,10 @@ export class AuthService {
         html: `
         <html>
           <body>
-            <p>Halo, ${user ? `<b>${user.username}</b>` : 'Pengguna'}!</p>
+            <h3>Halo, ${user ? `<b>${user.username}</b>` : 'Pengguna'}!</h3>
             <p>Terima kasih telah menggunakan aplikasi Reviu.ID</p>
             <br>
-            <br>
             <p>Berikut adalah kode OTP Anda: <b>${otpCode}</b></p>
-            <br>
             <br>
             <p>Catatan:</p>
             <ul>
@@ -343,9 +334,8 @@ export class AuthService {
               <li>Jika Anda tidak merasa melakukan permintaan ini, segera hubungi kami.</li>
             </ul>
             <br>
-            <br>
-            <p>Salam,</p>
-            <p>Tim Reviu.ID</p>
+            <p><i>Salam,</i></p>
+            <p><b><i>Tim Reviu.ID</i></b></p>
           </body>
         </html>
         `,
