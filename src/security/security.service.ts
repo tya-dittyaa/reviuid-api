@@ -165,7 +165,6 @@ export class SecurityService {
         });
         break;
       case 'USER_FILM_COMMENT':
-        // Get all reviews by user
         const review = await this.prisma.userFilmReview.findMany({
           where: {
             user_id: check.reportId,
@@ -203,7 +202,7 @@ export class SecurityService {
         });
         break;
       case 'USER_FORUM_CHILD_CONTENT':
-        await this.prisma.forumChild.delete({
+        await this.prisma.forumChild.deleteMany({
           where: {
             id: check.reportId,
           },
