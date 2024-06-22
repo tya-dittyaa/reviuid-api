@@ -33,6 +33,7 @@ model Users {
   UserFilmReview    UserFilmReview[]
   ForumParent       ForumParent[]
   ForumChild        ForumChild[]
+  UserReport        UserReport[]
 
   @@map("users")
 }
@@ -151,6 +152,22 @@ model ForumChild {
   @@map("forum_child")
 }
 
+model UserReport {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reportId      String
+  reportType    ReportType
+  reportContent String
+  reportStatus  Boolean    @default(false)
+
+  user_id String
+  user    Users  @relation(fields: [user_id], references: [id])
+
+  @@map("user_report")
+}
+
 enum OTPType {
   REGISTER
   FORGOT_PASSWORD
@@ -172,4 +189,14 @@ enum FilmGenre {
   PETUALANGAN
   PSIKOLOGIS
   ROMANSA
+}
+
+enum ReportType {
+  USER_AVATAR
+  USER_USERNAME
+  USER_BIOGRAPHY
+  USER_FILM_COMMENT
+  USER_FORUM_PARENT_TITLE
+  USER_FORUM_PARENT_CONTENT
+  USER_FORUM_CHILD_CONTENT
 }

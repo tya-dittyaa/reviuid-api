@@ -1,9 +1,12 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { ReportType } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { AddUserReportDto } from './dto/addUserReport.dto';
 
 @Injectable()
 export class SecurityService {
-  constructor() {}
+  constructor(private readonly prisma: PrismaService) {}
 
   geminiModel() {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -59,5 +62,151 @@ export class SecurityService {
 
     // Return response
     return answer;
+  }
+
+  async reportUsers() {
+    return await this.prisma.userReport.findMany({
+      select: {
+        id: true,
+        reportId: true,
+        reportType: true,
+        reportContent: true,
+        user: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      },
+      where: {
+        reportStatus: false,
+      },
+    });
+  }
+
+  async addUserReport(dto: AddUserReportDto) {
+    return await this.prisma.userReport.create({
+      data: {
+        user_id: dto.user_id,
+        reportId: dto.reportId,
+        reportType: dto.reportType,
+        reportContent: dto.reportContent,
+      },
+    });
+  }
+
+  async ignoreUserReport(reportId: string) {
+    if (!reportId) {
+      throw new BadRequestException('Report ID is required');
+    }
+
+    return await this.prisma.userReport.update({
+      where: {
+        id: reportId,
+      },
+      data: {
+        reportStatus: true,
+      },
+    });
+  }
+
+  async actionUserReport(reportId: string, reportType: ReportType) {
+    if (!reportId) {
+      throw new BadRequestException('Report ID is required');
+    }
+
+    const check = await this.prisma.userReport.findUnique({
+      where: {
+        id: reportId,
+      },
+    });
+
+    if (!check) {
+      throw new BadRequestException('Report not found');
+    }
+
+    switch (reportType) {
+      case 'USER_AVATAR':
+        await this.prisma.users.update({
+          where: {
+            id: check.reportId,
+          },
+          data: {
+            avatar:
+              'https://lh3.googleusercontent.com/d/1yhM-tDrQwh166RGAqTGzLKPvVri7jAKD',
+          },
+        });
+        break;
+      case 'USER_USERNAME':
+        const randomUsername = Math.random().toString(36).substring(7);
+        await this.prisma.users.update({
+          where: {
+            id: check.reportId,
+          },
+          data: {
+            username: randomUsername,
+          },
+        });
+      case 'USER_BIOGRAPHY':
+        await this.prisma.users.update({
+          where: {
+            id: check.reportId,
+          },
+          data: {
+            biography: '',
+          },
+        });
+        break;
+      case 'USER_FILM_COMMENT':
+        await this.prisma.userFilmReview.delete({
+          where: {
+            id: check.reportId,
+          },
+        });
+        break;
+      case 'USER_FORUM_PARENT_TITLE':
+        await this.prisma.forumChild.deleteMany({
+          where: {
+            forum_parent_id: check.reportId,
+          },
+        });
+        await this.prisma.forumParent.delete({
+          where: {
+            id: check.reportId,
+          },
+        });
+        break;
+      case 'USER_FORUM_PARENT_CONTENT':
+        await this.prisma.forumChild.deleteMany({
+          where: {
+            forum_parent_id: check.reportId,
+          },
+        });
+        await this.prisma.forumParent.delete({
+          where: {
+            id: check.reportId,
+          },
+        });
+        break;
+      case 'USER_FORUM_CHILD_CONTENT':
+        await this.prisma.forumChild.delete({
+          where: {
+            id: check.reportId,
+          },
+        });
+        break;
+
+      default:
+        throw new BadRequestException('Report type not found');
+    }
+
+    return await this.prisma.userReport.update({
+      where: {
+        id: reportId,
+      },
+      data: {
+        reportStatus: true,
+      },
+    });
   }
 }

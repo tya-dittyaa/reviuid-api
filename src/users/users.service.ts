@@ -132,6 +132,7 @@ export class UsersService {
     }
 
     return {
+      id: user.id,
       username: user.username,
       biography: user.biography,
       avatar: user.avatar,
