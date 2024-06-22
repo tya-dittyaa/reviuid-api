@@ -154,6 +154,7 @@ export class SecurityService {
             username: randomUsername,
           },
         });
+        break;
       case 'USER_BIOGRAPHY':
         await this.prisma.users.update({
           where: {
