@@ -56,7 +56,6 @@ export class SecurityService {
       const response = await result.response.text();
       answer = parseInt(response) === 0 ? false : true;
     } catch (error) {
-      console.log(error);
       if (
         error.message ===
         '[GoogleGenerativeAI Error]: Candidate was blocked due to SAFETY'
@@ -174,7 +173,7 @@ export class SecurityService {
 
         if (review.length > 0) {
           for (const r of review) {
-            await this.usersService.removeFilmReview(check.reportId, r.film_id);
+            await this.usersService.removeFilmReview(check.user_id, r.film_id);
           }
         }
         break;
