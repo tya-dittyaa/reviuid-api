@@ -48,7 +48,7 @@ export class SecurityService {
     }
 
     // Create prompt
-    const prompt = `Mohon berikan saya jawaban dalam 1 angka jika benar adalah '1' dan salah adalah '0' jika kalimat dibawah ini mengandung salah satu unsur kata kasar, unsur kata jorok, unsur SARA (Suku, Agama, Ras, Antar-golongan), ujaran kebencian, kata-kata yang merendahkan, promosi, iklan, spam, atau hal-hal yang tidak pantas lainnya dalam semua bahasa (utamakan bahasa indonesia dan bahasa daerah di indonesia), dan mohon di cek perhurufnya juga karena bisa saja dituliskan secara sambung tanpa spasi ataupun diubah menggunakan angka, kalimat yang di cek, segala angka dan singkatan yang mengandung kemungkinan pornografi, iklan, dan no telp dari kalimat yaitu: "${text}"`;
+    const prompt = `Mohon berikan saya jawaban dalam 1 angka jika benar adalah '1' dan salah adalah '0' jika kalimat dibawah ini mengandung salah satu unsur kata kasar, unsur kata jorok, unsur SARA (Suku, Agama, Ras, Antar-golongan), unsur kata-kata LGBTQ+, unsur ujaran kebencian, unsur kata-kata yang merendahkan, unsur promosi, unsur iklan, unsur spam, atau hal-hal yang tidak pantas lainnya dalam semua bahasa (utamakan bahasa indonesia dan bahasa daerah di indonesia), dan mohon di cek perhurufnya juga karena bisa saja dituliskan secara sambung tanpa spasi ataupun diubah menggunakan angka, kalimat yang di cek, segala angka dan singkatan yang mengandung kemungkinan pornografi, iklan, dan no telp dari kalimat yaitu: "${text}"`;
 
     // Generate content
     try {
